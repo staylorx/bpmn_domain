@@ -1,0 +1,109 @@
+// Fixture: Payment Processing Workflow
+// Domain: E-commerce / financial
+// Uses: PaymentValidityChecker from OrderToDelivery.cd
+//
+// Models the full payment capture flow:
+//   1. Payment authorisation via card validation.
+//   2. Fraud scoring (parallel with card expiry check).
+//   3. Conditional capture or decline.
+//   4. Compensation if post-capture issues arise.
+//   5. Timer-driven retry for failed authorisation.
+
+package fixtures;
+
+import de.monticore.bpmn.cds.OrderToDelivery.*;
+
+process PaymentProcessing {
+
+  data checker:PaymentValidityChecker;
+  data order:Order;
+
+  message paymentRequest:String;
+  message captureConfirmation:String;
+  message declineNotice:String;
+  error CardDeclinedError:String;
+  error FraudDetectedError:String;
+
+  operation authorisePayment(
+    in paymentRequest;
+    out captureConfirmation
+  ) throws CardDeclinedError;
+
+  operation capturePayment(
+    in captureConfirmation;
+    out captureConfirmation
+  );
+
+  operation refundPayment(
+    in captureConfirmation;
+    out captureConfirmation
+  );
+
+  lane PaymentGateway {
+    start event PaymentInitiated catch message paymentRequest;
+
+    service task AuthoriseCard {
+      webservice = ##webservice;
+      operation = authorisePayment;
+      message = paymentRequest;
+      boundary event AuthorisationTimeout
+        catch timer [after PT30S];
+      boundary event CardDeclined
+        catch error CardDeclinedError;
+    }
+
+    service task CapturePayment {
+      webservice = ##webservice;
+      operation = capturePayment;
+      message = captureConfirmation;
+      boundary event CaptureFailed
+        catch compensate CapturePayment with RefundPayment;
+    }
+
+    service task RefundPayment {
+      webservice = ##webservice;
+    }
+
+    send task SendDeclineNotice {
+      webservice = ##webservice;
+      message = declineNotice;
+    }
+
+    split and ParallelChecks;
+    merge and ChecksComplete;
+    split xor CaptureDecision;
+    merge xor PaymentResolved;
+
+    end event PaymentCaptured;
+    end event PaymentDeclined;
+  }
+
+  lane FraudDetection {
+    service task ScoreFraudRisk {
+      webservice = ##webservice;
+      in order:Order;
+    }
+    event FraudScoringDone;
+  }
+
+  lane CardValidation {
+    service task CheckCardExpiry {
+      webservice = ##webservice;
+      in checker:PaymentValidityChecker;
+    }
+    event ExpiryCheckDone;
+  }
+
+  PaymentInitiated
+    -> AuthoriseCard
+      -> ParallelChecks
+           -> ScoreFraudRisk -> FraudScoringDone -> ChecksComplete;
+           ParallelChecks -> CheckCardExpiry -> ExpiryCheckDone -> ChecksComplete;
+      -> CaptureDecision
+           -> {
+                [checker.paymentValid && checker.cardNumberValid] CapturePayment
+                  -> PaymentCaptured;
+                [_] SendDeclineNotice
+                  -> PaymentDeclined;
+              };
+}

@@ -1,0 +1,20 @@
+name: bpmn_domain
+description: >
+  A clean-architecture domain model for BPMN 2.0 Workflow DSL processes.
+  Provides rich, immutable domain entities for processes, activities, events,
+  gateways, data objects, sequence flows and conformance constructs — ready
+  for a parser / interpreter layer above.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  equatable: ^2.0.7
+  fpdart: ^1.2.0
+
+dev_dependencies:
+  lints: ^6.0.0
+  test: ^1.25.6
+  mocktail: ^1.0.4

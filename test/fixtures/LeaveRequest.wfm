@@ -1,0 +1,103 @@
+// Fixture: Leave Request Approval Process
+// Domain: HR / leave management
+// Uses: Domain.cd (DomainUser, LeaveCard, LeaveEntry, MedicalCertificate, Report)
+//
+// This process models an employee leave request workflow:
+//   1. Employee submits a leave request with dates.
+//   2. The system validates the request against available leave days.
+//   3. A manager approves or rejects the request.
+//   4. If approved, the leave card is updated; if rejected, the employee is notified.
+//   5. For sick leave, a medical certificate may be required after return.
+
+package fixtures;
+
+import de.monticore.bpmn.cds.Domain.*;
+
+process LeaveRequest {
+
+  data employee:DomainUser;
+  data leaveCard:LeaveCard;
+  store entries:LeaveEntry;
+
+  message rejectionNotice:String;
+  message approvalNotice:String;
+  message certRequest:String;
+
+  error ValidationError:String;
+  error InsufficientLeaveError:String;
+
+  operation notifyRejection(
+    in rejectionNotice;
+    out rejectionNotice
+  );
+
+  operation notifyApproval(
+    in approvalNotice;
+    out approvalNotice
+  );
+
+  lane Employee {
+    start event SubmitRequest catch;
+    send task NotifyEmployeeRejected {
+      webservice = ##webservice;
+      operation = notifyRejection;
+      message = rejectionNotice;
+    }
+    send task NotifyEmployeeApproved {
+      webservice = ##webservice;
+      operation = notifyApproval;
+      message = approvalNotice;
+    }
+    user task SubmitMedicalCertificate {
+      in employee:DomainUser;
+    }
+    end event RequestClosed;
+  }
+
+  lane HRSystem {
+    service task ValidateRequest {
+      webservice = ##webservice;
+      in leaveCard:LeaveCard;
+      boundary event ValidationFailed
+        catch error ValidationError;
+    }
+    service task CheckLeaveDays {
+      webservice = ##webservice;
+      in leaveCard:LeaveCard;
+      boundary event InsufficientDays
+        catch error InsufficientLeaveError;
+    }
+    service task UpdateLeaveCard {
+      webservice = ##webservice;
+      in leaveCard:LeaveCard;
+      out leaveCard:LeaveCard;
+    }
+    event LeaveRecorded;
+  }
+
+  lane Manager {
+    user task ReviewRequest {
+      in leaveCard:LeaveCard;
+      in employee:DomainUser;
+    }
+    split xor ApprovalDecision;
+    merge xor FinaliseRequest;
+  }
+
+  SubmitRequest
+    -> ValidateRequest
+      -> CheckLeaveDays
+        -> ReviewRequest
+          -> ApprovalDecision
+            -> {
+                 [leaveCard.checker.allProductsAvailable] UpdateLeaveCard
+                   -> LeaveRecorded
+                   -> NotifyEmployeeApproved
+                   -> FinaliseRequest;
+                 [_] NotifyEmployeeRejected
+                   -> FinaliseRequest;
+               }
+          -> RequestClosed;
+
+  LeaveRecorded -> SubmitMedicalCertificate -> RequestClosed;
+}

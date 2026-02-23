@@ -1,0 +1,77 @@
+// Fixture class diagram: HR Domain types.
+// Independently authored for our test suite — mirrors concepts from
+// Domain.cd in the MontiCore BPMN repo but extends them for richer testing.
+//
+// Used by: LeaveRequest.wfm, EmployeeOnboarding.wfm
+
+package fixtures;
+
+classdiagram HRDomain {
+
+    // An employment contract linking a user to the organisation.
+    // version tracks contract amendments; valid indicates the employee
+    // has counter-signed the current version.
+    class Contract {
+        java.time.ZonedDateTime hiringDate;
+        java.time.ZonedDateTime expiryDate;
+        public int version;
+        public boolean valid;
+        public String position;
+        public String department;
+    }
+
+    // The canonical user/employee entity within the system.
+    // A DomainUser can have many Contracts (e.g. renewals over time)
+    // but only one active LeaveCard.
+    class DomainUser {
+        public String userID;
+        public String fullName;
+        public String email;
+        public boolean active;
+    }
+
+    // Accumulates all leave entries for a user across the year.
+    // totalRemainingDays is derived from the sum of each LeaveEntry.
+    class LeaveCard {
+        public int annualEntitlement;
+        /int totalRemainingDays;
+    }
+
+    // A single leave-request entry against a user's LeaveCard.
+    // workingDays and remainingLeaveDays are derived fields computed
+    // from startDate/endDate and the user's LeaveCard entitlement.
+    class LeaveEntry {
+        java.time.ZonedDateTime startDate;
+        java.time.ZonedDateTime endDate;
+        public String leaveType;   // ANNUAL, SICK, COMPASSIONATE, UNPAID
+        /int workingDays;
+        /int remainingLeaveDays;
+        public DomainUser substitute;
+        public boolean valid;
+        public boolean approved;
+    }
+
+    // Supporting document for sick-leave requests.
+    // After an employee returns from sick leave, this certificate is
+    // submitted via the SubmitMedicalCertificate user task.
+    class MedicalCertificate {
+        java.time.ZonedDateTime startDate;
+        java.time.ZonedDateTime endDate;
+        public String description;
+        public String issuingDoctor;
+        public boolean verified;
+    }
+
+    // A report produced after a leave review or audit.
+    class Report {
+        public String result;
+        public String details;
+        java.time.ZonedDateTime generatedAt;
+    }
+
+    // Associations
+    association contracts [1] DomainUser -> Contract [*];
+    association entries [1] LeaveCard -> LeaveEntry [*];
+    association [1] LeaveCard -> DomainUser [1];
+    association [0..1] LeaveEntry -> MedicalCertificate [0..1];
+}

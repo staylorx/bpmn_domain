@@ -1,0 +1,85 @@
+// Fixture class diagram: Order-to-Delivery domain types.
+// Mirrors the structure of the MontiCore BPMN repo's OrderToDelivery.cd
+// but is an independently authored fixture for use in our test suite.
+//
+// This diagram defines all types used in PaymentProcessing.wfm and 
+// any workflow that handles e-commerce orders and shipments.
+
+package fixtures;
+
+classdiagram OrderToDelivery {
+
+    // Tracks stock availability for all products in an order.
+    // Used in condition expressions such as [checker.allProductsAvailable].
+    public class InventoryAvailabilityChecker {
+        public boolean allProductsAvailable;
+        public List<Product> unavailableProducts;
+    }
+
+    // Core order entity — the central data object passed through the
+    // order-to-delivery workflow.  The checker field is populated after
+    // the CheckProductAvailability service task completes.
+    public class Order {
+        public String orderID;
+        public String customerID;
+        public int numberOfOrderedProducts;
+        public List<Product> orderList;
+        public InventoryAvailabilityChecker checker;
+        public double totalCost;
+    }
+
+    // A single product line in an order.
+    public class Product {
+        public String productID;
+        public String name;
+        public int orderQuantity;
+        public double unitPrice;
+        public boolean inStock;
+    }
+
+    // Delivery preferences agreed with the customer at order time.
+    // The isOrderPickedUp flag drives the branch condition in the
+    // Warehouse lane of the order-to-delivery workflow.
+    public class CustomerDeliveryAgreement {
+        public String customerID;
+        public boolean isOrderPickedUp;
+        public DestinationAddress address;
+        public String preferredCarrier;
+    }
+
+    // A physical delivery address used as the output of the
+    // PrintShippingLabel → getAddress operation.
+    public class DestinationAddress {
+        public String street;
+        public String houseNumber;
+        public String postalCode;
+        public String city;
+        public String countryCode;
+    }
+
+    // Holds card payment validation results.
+    // cardVerificationValueValid drives the CaptureDecision gateway.
+    public class PaymentValidityChecker {
+        public boolean paymentValid;
+        public boolean cardNumberValid;
+        public boolean cardVerificationValueValid;
+        public String paymentMethod;
+        public String cardNumber;
+        public String cardVerificationValue;
+        public String cardExpirationDate;
+    }
+
+    // Represents a shipment that is dispatched after packing.
+    public class Shipment {
+        public String trackingNumber;
+        public String carrier;
+        public DestinationAddress destination;
+        public java.time.ZonedDateTime dispatchedAt;
+        public boolean delivered;
+    }
+
+    association [1] Order -> InventoryAvailabilityChecker [1];
+    association lineItems [1] Order -> Product [*];
+    association [1] CustomerDeliveryAgreement -> DestinationAddress [1];
+    association [1] Shipment -> DestinationAddress [1];
+}

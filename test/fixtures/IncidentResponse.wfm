@@ -1,0 +1,97 @@
+// Fixture: IT Incident Response Process
+// Domain: IT operations / SRE
+//
+// Demonstrates:
+//   - Event-based gateway (receive first) waiting for first-responder acknowledgement
+//   - Timer escalation with non-interrupting boundary event
+//   - Call-activity to a reusable diagnostics sub-process
+//   - Parallel investigation tracks (AND split/merge)
+//   - Conditional SLA breach handling with compensation
+
+package fixtures;
+
+process IncidentResponse {
+
+  data incidentID:String;
+  data severity:int;
+  data resolutionReport:String;
+
+  message alertMsg:String;
+  message slaBreach:String;
+  signal IncidentResolvedSignal:String;
+  escalation SLAWarning:String;
+  error UnresolvedIncidentError:String;
+
+  operation sendAlert(
+    in alertMsg;
+    out alertMsg
+  );
+
+  operation generateReport(
+    in resolutionReport;
+    out resolutionReport
+  );
+
+  lane Alerting {
+    start event IncidentDetected catch signal IncidentResolvedSignal;
+    send task SendPageAlert {
+      webservice = ##webservice;
+      operation = sendAlert;
+      message = alertMsg;
+    }
+    split receive first WaitForResponse;
+    event EngineerAcknowledged catch message alertMsg;
+    event AutoResolveTimeout catch timer [after PT15M];
+    end event IncidentClosed;
+  }
+
+  lane Engineering {
+    user task AcknowledgeIncident;
+
+    call-activity RunDiagnostics calls DiagnosticsProcess;
+
+    split and InvestigationTracks;
+    merge and InvestigationComplete;
+
+    user task InspectLogs {
+      in incidentID:String;
+    }
+    user task CheckInfrastructure {
+      in incidentID:String;
+      boundary event SLABreach
+        catch noninterrupt escalation SLAWarning;
+    }
+
+    split xor ResolutionDecision;
+    user task ApplyFix;
+    user task EscalateToVendor;
+    service task AutoRemediate {
+      webservice = ##webservice;
+    }
+    service task GenerateReport {
+      webservice = ##webservice;
+      operation = generateReport;
+      message = resolutionReport;
+    }
+  }
+
+  IncidentDetected
+    -> SendPageAlert
+      -> WaitForResponse
+           -> {
+                EngineerAcknowledged -> AcknowledgeIncident;
+                AutoResolveTimeout -> AutoRemediate;
+              }
+      -> RunDiagnostics
+        -> InvestigationTracks
+             -> InspectLogs -> InvestigationComplete;
+             InvestigationTracks -> CheckInfrastructure -> InvestigationComplete;
+        -> ResolutionDecision
+             -> {
+                  [severity >= 3] EscalateToVendor;
+                  [severity == 2] ApplyFix;
+                  [_] AutoRemediate;
+                }
+        -> GenerateReport
+          -> IncidentClosed;
+}

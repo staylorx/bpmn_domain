@@ -1,0 +1,87 @@
+// Fixture: Employee Onboarding Reference Process (Reference Model)
+// Domain: HR
+// Uses: Domain.cd (Contract, DomainUser)
+//
+// This is a REFERENCE model — concrete onboarding processes must incarnate
+// the abstract tasks defined here.
+//
+// Abstract tasks that must be incarnated:
+//   - ContractSigning
+//   - SystemSetup
+//   - Orientation
+//
+// Demonstrates:
+//   - Reference model with incarnation points
+//   - Loop (retry contract signing until valid)
+//   - Parallel onboarding tasks with AND gateway
+//   - Terminate end event if onboarding is abandoned
+
+package fixtures;
+
+import de.monticore.bpmn.cds.Domain.*;
+
+process EmployeeOnboarding {
+
+  data contract:Contract;
+  data newUser:DomainUser;
+
+  message welcomeMsg:String;
+  message contractPDF:String;
+
+  operation sendWelcome(
+    in welcomeMsg;
+    out welcomeMsg
+  );
+
+  start event OnboardingStarted;
+  end event OnboardingComplete;
+  end event OnboardingAbandoned terminate;
+
+  task ContractSigning while [!contract.valid] max 3;
+  task SystemSetup;
+  task Orientation;
+
+  manual task CollectDocuments {
+    resources = contract, newUser;
+  }
+
+  service task ProvisionAccounts {
+    webservice = ##webservice;
+    in newUser:DomainUser;
+    out newUser:DomainUser;
+  }
+
+  service task EnrolInBenefits {
+    webservice = ##webservice;
+    in newUser:DomainUser;
+  }
+
+  send task SendWelcomeKit {
+    webservice = ##webservice;
+    operation = sendWelcome;
+    message = welcomeMsg;
+  }
+
+  split and ParallelOnboarding;
+  merge and OnboardingTasksDone;
+  split xor OnboardingOutcome;
+  merge xor RetryContract;
+
+  OnboardingStarted
+    -> CollectDocuments
+      -> RetryContract
+        -> ContractSigning
+          -> OnboardingOutcome
+               -> {
+                    [contract.valid] ParallelOnboarding
+                      -> SystemSetup -> OnboardingTasksDone;
+                      ParallelOnboarding -> Orientation -> OnboardingTasksDone;
+                      ParallelOnboarding -> ProvisionAccounts -> OnboardingTasksDone;
+                      ParallelOnboarding -> EnrolInBenefits -> OnboardingTasksDone;
+                    -> OnboardingTasksDone
+                      -> SendWelcomeKit
+                        -> OnboardingComplete;
+                    [contract.version > 3] OnboardingAbandoned;
+                    [_] RetryContract;
+                  };
+}

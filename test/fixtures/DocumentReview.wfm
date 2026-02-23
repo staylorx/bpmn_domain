@@ -1,0 +1,98 @@
+// Fixture: Document Review (Ad-hoc + Transaction)
+// Domain: Content management / compliance
+//
+// Demonstrates:
+//   - Ad-hoc subprocess for flexible peer review activities
+//   - Transaction subprocess for atomic publish-or-rollback
+//   - Multiple incarnation stereotypes for conformance testing
+//   - Non-interrupting escalation boundary events
+//   - Inclusive (IOR) gateway for optional supplemental tasks
+
+package fixtures;
+
+process DocumentReview {
+
+  data documentID:String;
+  data reviewScore:int;
+  data publishedVersion:String;
+
+  message reviewSummary:String;
+  message escalationMsg:String;
+  escalation QualityWarning:String;
+  error PublishError:String;
+
+  operation summariseReview(
+    in reviewSummary;
+    out reviewSummary
+  );
+
+  lane Author {
+    start event DraftSubmitted;
+    user task ReviseDocument {
+      in documentID:String;
+    }
+    end event DocumentPublished;
+    end event DocumentRejected;
+  }
+
+  lane ReviewBoard {
+    adhoc [reviewScore >= 3] parallel subprocess PeerReviewActivities {
+      user task ReviewAbstract;
+      user task ReviewMethodology;
+      user task ReviewConclusion;
+      user task CheckPlagiarism;
+    }
+
+    service task AggregateScores {
+      webservice = ##webservice;
+      operation = summariseReview;
+      message = reviewSummary;
+    }
+
+    split ior SupplementalTasks;
+    merge ior SupplementalDone;
+    split xor ReviewOutcome;
+    merge xor ReviewCycleComplete;
+  }
+
+  lane PublicationSystem {
+    transaction PublishTransaction {
+      service task UploadToRepository {
+        webservice = ##webservice;
+        boundary event UploadFailed catch error PublishError;
+      }
+      service task UpdateSearchIndex {
+        webservice = ##webservice;
+      }
+      service task RollbackPublish {
+        webservice = ##webservice;
+      }
+      start event BeginPublish;
+      end event PublishCommitted;
+      event PublishCancelled throw cancel;
+
+      boundary event TransactionFailed catch cancel;
+    }
+
+    event RepositoryUpdated;
+  }
+
+  DraftSubmitted
+    -> PeerReviewActivities
+      -> AggregateScores
+        -> SupplementalTasks
+             -> {
+                  [reviewScore < 2] ReviseDocument;
+                  [reviewScore >= 4] UploadToRepository;
+                }
+             -> SupplementalDone
+        -> ReviewOutcome
+             -> {
+                  [reviewScore >= 3] BeginPublish
+                    -> PublishCommitted
+                      -> RepositoryUpdated
+                        -> DocumentPublished;
+                  [_] DocumentRejected;
+                }
+        -> ReviewCycleComplete;
+}
