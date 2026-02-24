@@ -4,6 +4,7 @@ description: >
   Provides rich, immutable domain entities for processes, activities, events,
   gateways, data objects, sequence flows and conformance constructs — ready
   for a parser / interpreter layer above.
+repository: https://github.com/staylorx/bpmn_domain
 version: 0.1.0
 publish_to: none
 
