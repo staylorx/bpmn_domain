@@ -1,3 +1,47 @@
-## 1.0.0
+# Changelog
 
-- Initial version.
+All notable changes to this project are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+
+- `BACKLOG.md` — open/pending items only. Records the Windows-lane build/audit
+  findings (Dart SDK 3.13.1) and every divergence between this repo and the
+  Dart/Flutter Bible (`staylorx/dart-flutter-bible`, `docs/` §1–§12), each as a
+  `Deviation:` item flagged for review rather than auto-fixed.
+
+### Changed
+
+- `CHANGELOG.md` reformatted to Keep a Changelog: added the file preamble, the
+  `[Unreleased]` section, and `Added`/`Changed`/`Fixed`/`Notes` headings.
+- `CHANGELOG.md`: the release heading was **corrected from `1.0.0` to `0.1.0`**
+  to match `version:` in `pubspec.yaml`. `dart pub publish --dry-run` flagged the
+  mismatch ("CHANGELOG.md doesn't mention current version (0.1.0)"); the package
+  version is the source of truth, so the changelog follows it. No entry content
+  other than the heading was changed.
+
+### Fixed
+
+- Nothing yet.
+
+### Notes
+
+- Gates run fresh on `main` @ `c44dbff` for this audit: `dart pub get` OK;
+  `dart format . --set-exit-if-changed` 28 files, 0 changed; `dart test` 124
+  passed, 0 failed; `dart pub publish --dry-run` 1 warning (fixed above);
+  `dart analyze --fatal-infos` **RED — 61 × `deprecated_member_use`**
+  (`EquatableMixin`), tracked in `BACKLOG.md`. No source code changed in this
+  pass.
+
+## [0.1.0] - 2026-02-23
+
+### Added
+
+- Initial version: clean-architecture domain model for the MontiCore BPMN
+  Workflow DSL (`.wfm`) and CD4Analysis class diagrams (`.cd`) — immutable,
+  equatable entities, value objects, class-diagram model, and a sealed
+  `WorkflowFailure` hierarchy for the CoCo conformance constructs.
