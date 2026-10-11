@@ -1,4 +1,5 @@
 import 'package:bpmn_domain/bpmn_domain.dart';
+import 'package:shouldly/shouldly.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -8,105 +9,112 @@ void main() {
 
   group('Given NodeId', () {
     test('Then equality is structural', () {
-      expect(
-          const NodeId('ProcessOrder'), equals(const NodeId('ProcessOrder')));
-      expect(
-          const NodeId('ProcessOrder'), isNot(equals(const NodeId('Other'))));
+      const NodeId('ProcessOrder').should.be(const NodeId('ProcessOrder'));
+      const NodeId('ProcessOrder').should.not.be(const NodeId('Other'));
     });
 
     test('Then isSimpleName rejects qualified names', () {
-      expect(const NodeId('ProcessOrder').isSimpleName, isTrue);
-      expect(const NodeId('de.monticore.bpmn').isSimpleName, isFalse);
+      const NodeId('ProcessOrder').isSimpleName.should.beTrue();
+      const NodeId('de.monticore.bpmn').isSimpleName.should.beFalse();
     });
 
     test('Then toString returns value', () {
-      expect(const NodeId('Foo').toString(), 'Foo');
+      (const NodeId('Foo').toString()).should.be('Foo');
     });
   });
 
   group('Given QualifiedNodeId', () {
     test('Then parse splits on dots', () {
       final q = QualifiedNodeId.parse(
-          'de.monticore.bpmn.examples.OrderToDeliveryWorkflow');
-      expect(q.segments.length, 5);
-      expect(q.simpleName, 'OrderToDeliveryWorkflow');
-      expect(q.qualifier, 'de.monticore.bpmn.examples');
+        'de.monticore.bpmn.examples.OrderToDeliveryWorkflow',
+      );
+      q.segments.should.haveCount(5);
+      (q.simpleName).should.be('OrderToDeliveryWorkflow');
+      (q.qualifier).should.be('de.monticore.bpmn.examples');
     });
 
     test('Then toString rejoins segments', () {
       final q = QualifiedNodeId(['de', 'pkg', 'MyProcess']);
-      expect(q.toString(), 'de.pkg.MyProcess');
+      (q.toString()).should.be('de.pkg.MyProcess');
     });
   });
 
   group('Given PackagePath', () {
     test('Then root is empty', () {
-      expect(PackagePath.root.isRoot, isTrue);
-      expect(PackagePath.root.toString(), '');
+      PackagePath.root.isRoot.should.beTrue();
+      (PackagePath.root.toString()).should.be('');
     });
 
     test('Then parse produces correct segments', () {
       final p = PackagePath.parse('de.monticore.bpmn.examples');
-      expect(p.segments, ['de', 'monticore', 'bpmn', 'examples']);
+      (p.segments).should.be(['de', 'monticore', 'bpmn', 'examples']);
     });
 
     test('Then qualify prepends package', () {
       final p = PackagePath.parse('de.monticore.bpmn.examples');
-      expect(p.qualify('OrderToDeliveryWorkflow'),
-          'de.monticore.bpmn.examples.OrderToDeliveryWorkflow');
+      p
+          .qualify('OrderToDeliveryWorkflow')
+          .should
+          .be('de.monticore.bpmn.examples.OrderToDeliveryWorkflow');
     });
 
     test('Then root qualify returns simple name', () {
-      expect(PackagePath.root.qualify('Simple'), 'Simple');
+      (PackagePath.root.qualify('Simple')).should.be('Simple');
     });
   });
 
   group('Given Stereotype', () {
     test('Then incarnates factory', () {
       final s = Stereotype.incarnates('Research');
-      expect(s.key, 'incarnates');
-      expect(s.value, 'Research');
-      expect(s.toString(), '<<incarnates="Research">>');
+      (s.key).should.be('incarnates');
+      (s.value).should.be('Research');
+      (s.toString()).should.be('<<incarnates="Research">>');
     });
 
     test('Then marker stereotype without value', () {
       const s = Stereotype(key: 'abstract');
-      expect(s.toString(), '<<abstract>>');
+      (s.toString()).should.be('<<abstract>>');
     });
   });
 
   group('Given WfModifier', () {
     test('Then none has no stereotypes', () {
-      expect(WfModifier.none.stereotypes, isEmpty);
-      expect(WfModifier.none.isIncarnation, isFalse);
+      WfModifier.none.stereotypes.should.beEmpty();
+      WfModifier.none.isIncarnation.should.beFalse();
     });
 
     test('Then incarnatesTarget is extracted correctly', () {
       final mod = WfModifier(stereotypes: [Stereotype.incarnates('Draft')]);
-      expect(mod.isIncarnation, isTrue);
-      expect(mod.incarnatesTarget, 'Draft');
+      mod.isIncarnation.should.beTrue();
+      (mod.incarnatesTarget).should.be('Draft');
     });
   });
 
   group('Given WfTypeRef', () {
     test('Then equality is structural', () {
-      expect(WfTypeRef.string, equals(const WfTypeRef('String')));
-      expect(WfTypeRef.named('Order'), equals(WfTypeRef.named('Order')));
+      WfTypeRef.string.should.be(const WfTypeRef('String'));
+      WfTypeRef.named('Order').should.be(WfTypeRef.named('Order'));
     });
   });
 
   group('Given ImportStatement', () {
     test('Then wildcard toString', () {
       const imp = ImportStatement(
-          path: 'de.monticore.bpmn.cds.OrderToDelivery', wildcard: true);
-      expect(imp.toString(), 'import de.monticore.bpmn.cds.OrderToDelivery.*;');
+        path: 'de.monticore.bpmn.cds.OrderToDelivery',
+        wildcard: true,
+      );
+      (imp.toString()).should.be(
+        'import de.monticore.bpmn.cds.OrderToDelivery.*;',
+      );
     });
 
     test('Then named import toString', () {
-      const imp =
-          ImportStatement(path: 'de.monticore.bpmn.cds.OrderToDelivery.Order');
-      expect(imp.toString(),
-          'import de.monticore.bpmn.cds.OrderToDelivery.Order;');
+      const imp = ImportStatement(
+        path: 'de.monticore.bpmn.cds.OrderToDelivery.Order',
+      );
+      imp.toString().should.be(
+        'import de.monticore.bpmn.cds.OrderToDelivery.Order;',
+      );
     });
   });
 
@@ -117,20 +125,20 @@ void main() {
   group('Given WfGateway', () {
     test('Then splitXor factory', () {
       final g = WfGateway.splitXor('OrderFulfillable');
-      expect(g.id, const NodeId('OrderFulfillable'));
-      expect(g.direction, GatewayDirection.split);
-      expect(g.kind, isA<ExclusiveGateway>());
+      (g.id).should.be(const NodeId('OrderFulfillable'));
+      (g.direction).should.be(GatewayDirection.split);
+      g.kind.should.beOfType<ExclusiveGateway>();
     });
 
     test('Then mergeAnd factory', () {
       final g = WfGateway.mergeAnd('MergeWork');
-      expect(g.direction, GatewayDirection.merge);
-      expect(g.kind, isA<ParallelGateway>());
+      (g.direction).should.be(GatewayDirection.merge);
+      g.kind.should.beOfType<ParallelGateway>();
     });
 
     test('Then splitReceiveFirst is event-based', () {
       final g = WfGateway.splitReceiveFirst('WaitForResponse');
-      expect(g.kind, isA<ExclusiveEventGateway>());
+      g.kind.should.beOfType<ExclusiveEventGateway>();
     });
 
     test('Then complex gateway carries guard expression', () {
@@ -139,21 +147,23 @@ void main() {
         direction: GatewayDirection.split,
         kind: ComplexGateway(guard: 'majority(votes) > 0.5'),
       );
-      expect((g.kind as ComplexGateway).guard, 'majority(votes) > 0.5');
+      ((g.kind as ComplexGateway).guard).should.be('majority(votes) > 0.5');
     });
 
     test('Then equality is structural', () {
       final a = WfGateway.splitXor('G');
       final b = WfGateway.splitXor('G');
-      expect(a, equals(b));
+      a.should.be(b);
     });
   });
 
   group('Given WfInlineGateway', () {
     test('Then inline gateway has no id', () {
       const gw = WfInlineGateway(
-          direction: GatewayDirection.split, kind: ExclusiveGateway());
-      expect(gw.direction, GatewayDirection.split);
+        direction: GatewayDirection.split,
+        kind: ExclusiveGateway(),
+      );
+      (gw.direction).should.be(GatewayDirection.split);
     });
   });
 
@@ -163,31 +173,31 @@ void main() {
 
   group('Given EventTrigger', () {
     test('Then CancelTrigger toString', () {
-      expect(const CancelTrigger().toString(), 'cancel');
+      (const CancelTrigger().toString()).should.be('cancel');
     });
 
     test('Then CompensateTrigger with activity', () {
       final t = const CompensateTrigger(activity: NodeId('ProcessOrder'));
-      expect(t.toString(), 'compensate ProcessOrder');
+      (t.toString()).should.be('compensate ProcessOrder');
     });
 
     test('Then CompensateTrigger async flag', () {
       const t = CompensateTrigger(async: true);
-      expect(t.toString(), 'compensate async');
+      (t.toString()).should.be('compensate async');
     });
 
     test('Then ConditionalTrigger', () {
       const t = ConditionalTrigger(condition: 'stock.available > 0');
-      expect(t.toString(), 'when [stock.available > 0]');
+      (t.toString()).should.be('when [stock.available > 0]');
     });
 
     test('Then TerminateTrigger', () {
-      expect(const TerminateTrigger().toString(), 'terminate');
+      (const TerminateTrigger().toString()).should.be('terminate');
     });
 
     test('Then TimerTrigger', () {
       const t = TimerTrigger(condition: 'after PT4H');
-      expect(t.toString(), 'timer [after PT4H]');
+      (t.toString()).should.be('timer [after PT4H]');
     });
 
     test('Then NotificationTrigger message', () {
@@ -195,7 +205,7 @@ void main() {
         kind: NotificationKind.message,
         notificationName: NodeId('cancelMsg'),
       );
-      expect(t.toString(), 'message cancelMsg');
+      (t.toString()).should.be('message cancelMsg');
     });
 
     test('Then MultipleTrigger one', () {
@@ -203,7 +213,7 @@ void main() {
         triggers: [CancelTrigger(), TerminateTrigger()],
         parallel: false,
       );
-      expect(t.toString(), 'one { cancel, terminate }');
+      (t.toString()).should.be('one { cancel, terminate }');
     });
 
     test('Then MultipleTrigger all is parallel', () {
@@ -211,7 +221,7 @@ void main() {
         triggers: [CancelTrigger()],
         parallel: true,
       );
-      expect(t.toString(), 'all { cancel }');
+      (t.toString()).should.be('all { cancel }');
     });
   });
 
@@ -222,30 +232,30 @@ void main() {
   group('Given WfEvent', () {
     test('Then start factory creates catching start', () {
       final e = WfEvent.start('ReceiveOrder');
-      expect(e.id, const NodeId('ReceiveOrder'));
-      expect(e.role, EventRole.start);
-      expect(e.direction, EventDirection.catch_);
-      expect(e.isStart, isTrue);
-      expect(e.isNoneEvent, isTrue);
+      (e.id).should.be(const NodeId('ReceiveOrder'));
+      (e.role).should.be(EventRole.start);
+      (e.direction).should.be(EventDirection.catch_);
+      e.isStart.should.beTrue();
+      e.isNoneEvent.should.beTrue();
     });
 
     test('Then end factory creates throwing end', () {
       final e = WfEvent.end('OrderCompleted');
-      expect(e.role, EventRole.end);
-      expect(e.direction, EventDirection.throw_);
-      expect(e.isEnd, isTrue);
+      (e.role).should.be(EventRole.end);
+      (e.direction).should.be(EventDirection.throw_);
+      e.isEnd.should.beTrue();
     });
 
     test('Then terminate end event', () {
       final e = WfEvent.terminate('ProcessAborted');
-      expect(e.trigger, isA<TerminateTrigger>());
+      e.trigger.should.beOfType<TerminateTrigger>();
     });
 
     test('Then timerCatch event', () {
       final e = WfEvent.timerCatch('DailyReminder', 'every P1D');
-      expect(e.isTimer, isTrue);
-      expect(e.direction, EventDirection.catch_);
-      expect((e.trigger as TimerTrigger).condition, 'every P1D');
+      e.isTimer.should.beTrue();
+      (e.direction).should.be(EventDirection.catch_);
+      ((e.trigger as TimerTrigger).condition).should.be('every P1D');
     });
 
     test('Then compensationBoundary event', () {
@@ -254,23 +264,26 @@ void main() {
         compensatedActivity: 'ProcessOrder',
         handlerActivity: 'RollbackOrderProcessing',
       );
-      expect(e.isBoundary, isTrue);
-      expect(e.compensationHandler?.compensatedActivity.value, 'ProcessOrder');
-      expect(e.compensationHandler?.handlerActivity.value,
-          'RollbackOrderProcessing');
+      e.isBoundary.should.beTrue();
+      (e.compensationHandler?.compensatedActivity.value).should.be(
+        'ProcessOrder',
+      );
+      (e.compensationHandler?.handlerActivity.value).should.be(
+        'RollbackOrderProcessing',
+      );
     });
 
     test('Then messageCatchStart', () {
       final e = WfEvent.messageCatchStart('ReceiveOrder', 'orderMsg');
-      expect(e.isMessage, isTrue);
-      expect(e.isStart, isTrue);
+      e.isMessage.should.beTrue();
+      e.isStart.should.beTrue();
     });
 
     test('Then errorEnd', () {
       final e = WfEvent.errorEnd('PaymentFailed', 'CardDeclinedError');
-      expect(e.isEnd, isTrue);
+      e.isEnd.should.beTrue();
       final trigger = e.trigger as NotificationTrigger;
-      expect(trigger.kind, NotificationKind.error);
+      (trigger.kind).should.be(NotificationKind.error);
     });
   });
 
@@ -281,55 +294,55 @@ void main() {
   group('Given LoopCharacteristic', () {
     test('Then WfStandardLoop while', () {
       final l = WfStandardLoop.whileLoop('retries < 3', max: 5);
-      expect(l.isWhile, isTrue);
-      expect(l.loopCondition, 'retries < 3');
-      expect(l.maxIterations, 5);
-      expect(l.toString(), 'while [retries < 3] max 5');
+      l.isWhile.should.beTrue();
+      (l.loopCondition).should.be('retries < 3');
+      (l.maxIterations).should.be(5);
+      (l.toString()).should.be('while [retries < 3] max 5');
     });
 
     test('Then WfStandardLoop until', () {
       final l = WfStandardLoop.untilLoop('delivered == true');
-      expect(l.isWhile, isFalse);
-      expect(l.toString(), 'until [delivered == true]');
+      l.isWhile.should.beFalse();
+      (l.toString()).should.be('until [delivered == true]');
     });
 
     test('Then WfLoopCardinality literal', () {
       final c = WfLoopCardinality.count(5);
-      expect(c.literalCount, 5);
-      expect(c.toString(), 'count 5');
+      (c.literalCount).should.be(5);
+      (c.toString()).should.be('count 5');
     });
 
     test('Then WfLoopCardinality expression', () {
       final c = WfLoopCardinality.expression('order.numberOfOrderedProducts');
-      expect(c.expression, 'order.numberOfOrderedProducts');
-      expect(c.toString(), 'count [order.numberOfOrderedProducts]');
+      (c.expression).should.be('order.numberOfOrderedProducts');
+      (c.toString()).should.be('count [order.numberOfOrderedProducts]');
     });
 
     test('Then WfLoopCardinality collection', () {
       final c = WfLoopCardinality.collection('orderItems');
-      expect(c.collectionName, 'orderItems');
-      expect(c.toString(), 'count orderItems');
+      (c.collectionName).should.be('orderItems');
+      (c.toString()).should.be('count orderItems');
     });
 
     test('Then WfMILoop parallel over collection', () {
       final l = WfMILoop.parallelOver('orderItems');
-      expect(l.isParallel, isTrue);
-      expect(l.cardinality.collectionName, 'orderItems');
+      l.isParallel.should.beTrue();
+      (l.cardinality.collectionName).should.be('orderItems');
     });
 
     test('Then WfMILoop sequential', () {
       final l = WfMILoop.sequential(3);
-      expect(l.isParallel, isFalse);
-      expect(l.cardinality.literalCount, 3);
+      l.isParallel.should.beFalse();
+      (l.cardinality.literalCount).should.be(3);
     });
   });
 
   group('Given WfTask', () {
     test('Then generic task factory', () {
       final t = WfTask.generic('Introduction');
-      expect(t.id.value, 'Introduction');
-      expect(t.type, TaskType.generic);
-      expect(t.hasBoundaryEvents, isFalse);
+      (t.id.value).should.be('Introduction');
+      (t.type).should.be(TaskType.generic);
+      t.hasBoundaryEvents.should.beFalse();
     });
 
     test('Then service task factory', () {
@@ -338,15 +351,15 @@ void main() {
         webservice: '##webservice',
         operationName: 'processOrderOp',
       );
-      expect(t.type, TaskType.service);
-      expect(t.taskTypeAttributes?.webservice, '##webservice');
-      expect(t.taskTypeAttributes?.operation?.value, 'processOrderOp');
+      (t.type).should.be(TaskType.service);
+      (t.taskTypeAttributes?.webservice).should.be('##webservice');
+      (t.taskTypeAttributes?.operation?.value).should.be('processOrderOp');
     });
 
     test('Then manual task with resources', () {
       final t = WfTask.manual('PrepareAndPackProducts', ['order', 'products']);
-      expect(t.type, TaskType.manual);
-      expect(t.taskTypeAttributes?.resources, ['order', 'products']);
+      (t.type).should.be(TaskType.manual);
+      (t.taskTypeAttributes?.resources).should.be(['order', 'products']);
     });
 
     test('Then send task', () {
@@ -356,8 +369,8 @@ void main() {
         messageName: 'cancelMsg',
         operationName: 'prepCancelMsg',
       );
-      expect(t.type, TaskType.send);
-      expect(t.taskTypeAttributes?.message?.value, 'cancelMsg');
+      (t.type).should.be(TaskType.send);
+      (t.taskTypeAttributes?.message?.value).should.be('cancelMsg');
     });
 
     test('Then script task', () {
@@ -366,8 +379,8 @@ void main() {
         format: 'JavaScript',
         body: 'return input.trim();',
       );
-      expect(t.type, TaskType.script);
-      expect(t.taskTypeAttributes?.scriptFormat, 'JavaScript');
+      (t.type).should.be(TaskType.script);
+      (t.taskTypeAttributes?.scriptFormat).should.be('JavaScript');
     });
 
     test('Then incarnated task', () {
@@ -375,8 +388,8 @@ void main() {
         id: const NodeId('LiteratureReview'),
         modifier: WfModifier(stereotypes: [Stereotype.incarnates('Research')]),
       );
-      expect(t.isIncarnation, isTrue);
-      expect(t.incarnatesTarget, 'Research');
+      t.isIncarnation.should.beTrue();
+      (t.incarnatesTarget).should.be('Research');
     });
 
     test('Then service task with MI loop', () {
@@ -384,25 +397,26 @@ void main() {
         name: 'CheckProductAvailability',
         webservice: '##webservice',
         loop: WfMILoop(
-          cardinality:
-              WfLoopCardinality.expression('order.numberOfOrderedProducts'),
+          cardinality: WfLoopCardinality.expression(
+            'order.numberOfOrderedProducts',
+          ),
           isParallel: true,
         ),
       );
-      expect(t.loop, isA<WfMILoop>());
+      t.loop.should.beOfType<WfMILoop>();
     });
   });
 
   group('Given WfSubProcess', () {
     test('Then embedded subprocess', () {
       final sp = WfSubProcess.embedded('ShipOrder');
-      expect(sp.subProcessType, SubProcessType.embedded);
-      expect(sp.isTransaction, isFalse);
+      (sp.subProcessType).should.be(SubProcessType.embedded);
+      sp.isTransaction.should.beFalse();
     });
 
     test('Then transaction subprocess', () {
       final sp = WfSubProcess.transaction('PaymentBlock');
-      expect(sp.isTransaction, isTrue);
+      sp.isTransaction.should.beTrue();
     });
 
     test('Then adhoc subprocess', () {
@@ -411,18 +425,20 @@ void main() {
         completionCondition: 'allReviewed',
         parallel: true,
       );
-      expect(sp.isAdHoc, isTrue);
-      expect(sp.adHocCharacteristics?.isParallel, isTrue);
-      expect(sp.adHocCharacteristics?.completionCondition, 'allReviewed');
+      sp.isAdHoc.should.beTrue();
+      sp.adHocCharacteristics?.isParallel.should.beTrue();
+      (sp.adHocCharacteristics?.completionCondition).should.be('allReviewed');
     });
   });
 
   group('Given WfCallActivity', () {
     test('Then simple call activity', () {
       final ca = WfCallActivity.simple(
-          name: 'RunDiagnostics', calledProcessName: 'DiagnosticsProcess');
-      expect(ca.id.value, 'RunDiagnostics');
-      expect(ca.calledElement.value, 'DiagnosticsProcess');
+        name: 'RunDiagnostics',
+        calledProcessName: 'DiagnosticsProcess',
+      );
+      (ca.id.value).should.be('RunDiagnostics');
+      (ca.calledElement.value).should.be('DiagnosticsProcess');
     });
   });
 
@@ -433,97 +449,111 @@ void main() {
   group('Given WfIORequirement', () {
     test('Then WfIOSet input', () {
       final s = WfIOSet.inputItem('order', WfTypeRef.named('Order'));
-      expect(s.isInput, isTrue);
-      expect(s.dataSet.items.first.name.value, 'order');
-      expect(s.dataSet.items.first.type?.expression, 'Order');
+      s.isInput.should.beTrue();
+      (s.dataSet.items.first.name.value).should.be('order');
+      (s.dataSet.items.first.type?.expression).should.be('Order');
     });
 
     test('Then WfIOSet output', () {
       final s = WfIOSet.outputItem('report', WfTypeRef.named('PDF'));
-      expect(s.isInput, isFalse);
+      s.isInput.should.beFalse();
     });
 
     test('Then WfIORule', () {
       final rule = WfIORule(
-        inputSet: WfDataSet.single(WfDataIO(
-            name: const NodeId('order'), type: WfTypeRef.named('Order'))),
+        inputSet: WfDataSet.single(
+          WfDataIO(name: const NodeId('order'), type: WfTypeRef.named('Order')),
+        ),
         outputSet: WfDataSet.single(const WfDataIO(name: NodeId('invoice'))),
       );
-      expect(rule.inputSet.items.first.name.value, 'order');
-      expect(rule.outputSet.items.first.name.value, 'invoice');
+      (rule.inputSet.items.first.name.value).should.be('order');
+      (rule.outputSet.items.first.name.value).should.be('invoice');
     });
 
     test('Then WfDataIO loop flag', () {
       final d = WfDataIO(
-          name: const NodeId('items'),
-          type: WfTypeRef.named('Product'),
-          loop: true);
-      expect(d.loop, isTrue);
+        name: const NodeId('items'),
+        type: WfTypeRef.named('Product'),
+        loop: true,
+      );
+      d.loop.should.beTrue();
     });
 
     test('Then WfDataIO optional and whileExecuting', () {
       final d = const WfDataIO(
-          name: NodeId('config'), optional: true, whileExecuting: true);
-      expect(d.optional, isTrue);
-      expect(d.whileExecuting, isTrue);
+        name: NodeId('config'),
+        optional: true,
+        whileExecuting: true,
+      );
+      d.optional.should.beTrue();
+      d.whileExecuting.should.beTrue();
     });
   });
 
   group('Given WfDataObject', () {
     test('Then data factory', () {
       final d = WfDataObject.data('order', 'Order');
-      expect(d.kind, DataKind.dataObject);
-      expect(d.isDataObject, isTrue);
-      expect(d.isDataStore, isFalse);
-      expect(d.type.expression, 'Order');
+      (d.kind).should.be(DataKind.dataObject);
+      d.isDataObject.should.beTrue();
+      d.isDataStore.should.beFalse();
+      (d.type.expression).should.be('Order');
     });
 
     test('Then store factory', () {
       final d = WfDataObject.store('products', 'Product');
-      expect(d.kind, DataKind.dataStore);
-      expect(d.isDataStore, isTrue);
+      (d.kind).should.be(DataKind.dataStore);
+      d.isDataStore.should.beTrue();
     });
   });
 
   group('Given WfNotification', () {
     test('Then message notification', () {
       final n = WfNotification.message('cancelMsg', WfTypeRef.string);
-      expect(n.kind, NotificationKind.message);
-      expect(n.isMessage, isTrue);
-      expect(n.type, WfTypeRef.string);
+      (n.kind).should.be(NotificationKind.message);
+      n.isMessage.should.beTrue();
+      (n.type).should.be(WfTypeRef.string);
     });
 
     test('Then error notification', () {
       final n = WfNotification.error(
-          'CardDeclinedError', WfTypeRef.named('CardError'));
-      expect(n.isError, isTrue);
+        'CardDeclinedError',
+        WfTypeRef.named('CardError'),
+      );
+      n.isError.should.beTrue();
     });
 
     test('Then signal notification', () {
-      final n =
-          WfNotification.signal('IncidentResolved', WfTypeRef.named('String'));
-      expect(n.isSignal, isTrue);
+      final n = WfNotification.signal(
+        'IncidentResolved',
+        WfTypeRef.named('String'),
+      );
+      n.isSignal.should.beTrue();
     });
 
     test('Then escalation notification', () {
       final n = WfNotification.escalation(
-          'SLAWarning', WfTypeRef.named('SLAViolation'));
-      expect(n.isEscalation, isTrue);
+        'SLAWarning',
+        WfTypeRef.named('SLAViolation'),
+      );
+      n.isEscalation.should.beTrue();
     });
   });
 
   group('Given WfOperation', () {
     test('Then request-response operation', () {
       final op = WfOperation.requestResponse(
-          name: 'getAddress', input: 'customerID', output: 'address');
-      expect(op.hasOutput, isTrue);
-      expect(op.outParam?.value, 'address');
+        name: 'getAddress',
+        input: 'customerID',
+        output: 'address',
+      );
+      op.hasOutput.should.beTrue();
+      (op.outParam?.value).should.be('address');
     });
 
     test('Then one-way operation', () {
       final op = WfOperation.oneWay(name: 'sendAlert', input: 'alertMsg');
-      expect(op.hasOutput, isFalse);
-      expect(op.canThrowErrors, isFalse);
+      op.hasOutput.should.beFalse();
+      op.canThrowErrors.should.beFalse();
     });
 
     test('Then operation with thrown errors', () {
@@ -533,8 +563,8 @@ void main() {
         outParam: NodeId('captureConfirmation'),
         thrownErrors: [NodeId('CardDeclinedError')],
       );
-      expect(op.canThrowErrors, isTrue);
-      expect(op.thrownErrors.first.value, 'CardDeclinedError');
+      op.canThrowErrors.should.beTrue();
+      (op.thrownErrors.first.value).should.be('CardDeclinedError');
     });
   });
 
@@ -545,21 +575,21 @@ void main() {
   group('Given FlowCondition', () {
     test('Then ExpressionCondition toString', () {
       const c = ExpressionCondition('checker.allProductsAvailable');
-      expect(c.toString(), '[checker.allProductsAvailable]');
+      (c.toString()).should.be('[checker.allProductsAvailable]');
     });
 
     test('Then DefaultCondition toString', () {
-      expect(const DefaultCondition().toString(), '[_]');
+      (const DefaultCondition().toString()).should.be('[_]');
     });
   });
 
   group('Given FlowTarget', () {
     test('Then element target', () {
       final t = FlowTarget.element(const NodeId('ProcessOrder'));
-      expect(t.isElementRef, isTrue);
-      expect(t.isGateway, isFalse);
-      expect(t.isBlock, isFalse);
-      expect(t.hasCondition, isFalse);
+      t.isElementRef.should.beTrue();
+      t.isGateway.should.beFalse();
+      t.isBlock.should.beFalse();
+      t.hasCondition.should.beFalse();
     });
 
     test('Then element target with condition', () {
@@ -567,32 +597,36 @@ void main() {
         const NodeId('PrepareAndPackProducts'),
         condition: const ExpressionCondition('checker.allProductsAvailable'),
       );
-      expect(t.hasCondition, isTrue);
+      t.hasCondition.should.beTrue();
     });
 
     test('Then gateway target', () {
       final t = FlowTarget.gateway(
         const WfInlineGateway(
-            direction: GatewayDirection.split, kind: ExclusiveGateway()),
+          direction: GatewayDirection.split,
+          kind: ExclusiveGateway(),
+        ),
       );
-      expect(t.isGateway, isTrue);
+      t.isGateway.should.beTrue();
     });
 
     test('Then block target', () {
-      final t = FlowTarget.block(
-        const FlowBlock([]),
-      );
-      expect(t.isBlock, isTrue);
+      final t = FlowTarget.block(const FlowBlock([]));
+      t.isBlock.should.beTrue();
     });
   });
 
   group('Given SequenceFlow', () {
     test('Then linear flow factory', () {
-      final f =
-          SequenceFlow.linear('flow1', ['Start', 'Research', 'Draft', 'Done']);
-      expect(f.path.length, 4);
-      expect(f.path.first.elementRef?.value, 'Start');
-      expect(f.path.last.elementRef?.value, 'Done');
+      final f = SequenceFlow.linear('flow1', [
+        'Start',
+        'Research',
+        'Draft',
+        'Done',
+      ]);
+      f.path.should.haveCount(4);
+      (f.path.first.elementRef?.value).should.be('Start');
+      (f.path.last.elementRef?.value).should.be('Done');
     });
   });
 
@@ -603,13 +637,14 @@ void main() {
   group('Given TimerCondition', () {
     test('Then AtTimerCondition toString', () {
       const c = AtTimerCondition(TimeOfDay(hours: 9, minutes: 0));
-      expect(c.toString(), 'at 09:00');
+      (c.toString()).should.be('at 09:00');
     });
 
     test('Then OnDateTimerCondition toString', () {
       const c = OnDateTimerCondition(
-          date: CalendarDate(year: 2026, month: 6, day: 30));
-      expect(c.toString(), 'on 2026-06-30');
+        date: CalendarDate(year: 2026, month: 6, day: 30),
+      );
+      (c.toString()).should.be('on 2026-06-30');
     });
 
     test('Then OnDateTimerCondition with time', () {
@@ -617,27 +652,27 @@ void main() {
         date: CalendarDate(year: 2026, month: 6, day: 30),
         atTime: AtTimerCondition(TimeOfDay(hours: 17, minutes: 0)),
       );
-      expect(c.toString(), 'on 2026-06-30 at 17:00');
+      (c.toString()).should.be('on 2026-06-30 at 17:00');
     });
 
     test('Then AfterPeriodCondition toString', () {
       const c = AfterPeriodCondition('PT4H');
-      expect(c.toString(), 'after PT4H');
+      (c.toString()).should.be('after PT4H');
     });
 
     test('Then EveryTimeCondition toString', () {
       const c = EveryTimeCondition(period: 'P1W');
-      expect(c.toString(), 'every P1W');
+      (c.toString()).should.be('every P1W');
     });
 
     test('Then EveryTimeCondition with times limit', () {
       const c = EveryTimeCondition(period: 'PT1H', times: 24);
-      expect(c.toString(), '24 times every PT1H');
+      (c.toString()).should.be('24 times every PT1H');
     });
 
     test('Then CronTimerCondition toString', () {
       const c = CronTimerCondition('0 9 * * MON-FRI');
-      expect(c.toString(), 'cron "0 9 * * MON-FRI"');
+      (c.toString()).should.be('cron "0 9 * * MON-FRI"');
     });
   });
 
@@ -649,8 +684,8 @@ void main() {
     test('Then lane holds elements', () {
       final task = WfTask.generic('ProcessOrder');
       final lane = WfLane(id: const NodeId('Sales'), elements: [task]);
-      expect(lane.elements.length, 1);
-      expect(lane.elements.first, same(task));
+      lane.elements.should.haveCount(1);
+      identical(lane.elements.first, task).should.beTrue();
     });
   });
 
@@ -664,9 +699,9 @@ void main() {
         id: const NodeId('OrderToDeliveryWorkflow'),
         elements: [salesLane],
       );
-      expect(p.hasLanes, isTrue);
-      expect(p.lanes.length, 1);
-      expect(p.lanes.first.id.value, 'Sales');
+      p.hasLanes.should.beTrue();
+      p.lanes.should.haveCount(1);
+      (p.lanes.first.id.value).should.be('Sales');
     });
 
     test('Then process without lanes', () {
@@ -674,7 +709,7 @@ void main() {
         id: const NodeId('SimpleProcess'),
         elements: [WfTask.generic('DoWork')],
       );
-      expect(p.hasLanes, isFalse);
+      p.hasLanes.should.beFalse();
     });
   });
 
@@ -684,15 +719,16 @@ void main() {
         package: PackagePath.parse('de.monticore.bpmn.examples'),
         process: const WfProcess(id: NodeId('OrderToDeliveryWorkflow')),
       );
-      expect(cu.fullyQualifiedName,
-          'de.monticore.bpmn.examples.OrderToDeliveryWorkflow');
+      cu.fullyQualifiedName.should.be(
+        'de.monticore.bpmn.examples.OrderToDeliveryWorkflow',
+      );
     });
 
     test('Then fully qualified name without package', () {
       final cu = const WorkflowCompilationUnit(
         process: WfProcess(id: NodeId('Simple')),
       );
-      expect(cu.fullyQualifiedName, 'Simple');
+      (cu.fullyQualifiedName).should.be('Simple');
     });
 
     test('Then imports are stored', () {
@@ -700,10 +736,12 @@ void main() {
         process: WfProcess(id: NodeId('P')),
         imports: [
           ImportStatement(
-              path: 'de.monticore.bpmn.cds.OrderToDelivery', wildcard: true)
+            path: 'de.monticore.bpmn.cds.OrderToDelivery',
+            wildcard: true,
+          ),
         ],
       );
-      expect(cu.imports.first.wildcard, isTrue);
+      cu.imports.first.wildcard.should.beTrue();
     });
   });
 
@@ -714,22 +752,24 @@ void main() {
   group('Given CdAttribute', () {
     test('Then public attribute', () {
       final a = CdAttribute.public('orderID', 'String');
-      expect(a.visibility, CdVisibility.public);
-      expect(a.isDerived, isFalse);
-      expect(a.toString(), 'public String orderID;');
+      (a.visibility).should.be(CdVisibility.public);
+      a.isDerived.should.beFalse();
+      (a.toString()).should.be('public String orderID;');
     });
 
     test('Then derived attribute', () {
       final a = CdAttribute.derived('workingDays', 'int');
-      expect(a.isDerived, isTrue);
-      expect(a.toString(), '/int workingDays;');
+      a.isDerived.should.beTrue();
+      (a.toString()).should.be('/int workingDays;');
     });
 
     test('Then package-local attribute has no visibility keyword', () {
-      const a =
-          CdAttribute(name: 'hiringDate', type: 'java.time.ZonedDateTime');
-      expect(a.visibility, CdVisibility.packageLocal);
-      expect(a.toString(), 'java.time.ZonedDateTime hiringDate;');
+      const a = CdAttribute(
+        name: 'hiringDate',
+        type: 'java.time.ZonedDateTime',
+      );
+      (a.visibility).should.be(CdVisibility.packageLocal);
+      (a.toString()).should.be('java.time.ZonedDateTime hiringDate;');
     });
   });
 
@@ -744,63 +784,73 @@ void main() {
         ],
         visibility: CdVisibility.public,
       );
-      expect(m.parameters.length, 2);
-      expect(m.toString(),
-          'public boolean checkAvailability(String productID, int qty);');
+      m.parameters.should.haveCount(2);
+      m.toString().should.be(
+        'public boolean checkAvailability(String productID, int qty);',
+      );
     });
   });
 
   group('Given CdMultiplicity', () {
     test('Then one toString', () {
-      expect(CdMultiplicity.one.toString(), '[1]');
+      (CdMultiplicity.one.toString()).should.be('[1]');
     });
     test('Then many toString', () {
-      expect(CdMultiplicity.many.toString(), '[*]');
+      (CdMultiplicity.many.toString()).should.be('[*]');
     });
     test('Then optional toString', () {
-      expect(CdMultiplicity.optional.toString(), '[0..1]');
+      (CdMultiplicity.optional.toString()).should.be('[0..1]');
     });
     test('Then atLeastOne toString', () {
-      expect(CdMultiplicity.atLeastOne.toString(), '[1..*]');
+      (CdMultiplicity.atLeastOne.toString()).should.be('[1..*]');
     });
     test('Then range toString', () {
-      expect(CdMultiplicity.range(2, 5).toString(), '[2..5]');
+      (CdMultiplicity.range(2, 5).toString()).should.be('[2..5]');
     });
   });
 
   group('Given CdAssociation', () {
     test('Then one-to-many factory', () {
       final a = CdAssociation.oneToMany(
-          source: 'LeaveCard', target: 'LeaveEntry', roleName: 'entries');
-      expect(a.sourceMultiplicity, CdMultiplicity.one);
-      expect(a.targetMultiplicity, CdMultiplicity.many);
-      expect(a.roleName, 'entries');
-      expect(
-          a.toString(), 'association [1] LeaveCard -> entries LeaveEntry [*];');
+        source: 'LeaveCard',
+        target: 'LeaveEntry',
+        roleName: 'entries',
+      );
+      (a.sourceMultiplicity).should.be(CdMultiplicity.one);
+      (a.targetMultiplicity).should.be(CdMultiplicity.many);
+      (a.roleName).should.be('entries');
+      a.toString().should.be(
+        'association [1] LeaveCard -> entries LeaveEntry [*];',
+      );
     });
 
     test('Then one-to-one factory', () {
       final a = CdAssociation.oneToOne(
-          source: 'CustomerDeliveryAgreement', target: 'DestinationAddress');
-      expect(a.targetMultiplicity, CdMultiplicity.one);
+        source: 'CustomerDeliveryAgreement',
+        target: 'DestinationAddress',
+      );
+      (a.targetMultiplicity).should.be(CdMultiplicity.one);
     });
   });
 
   group('Given CdClass', () {
     test('Then public data class', () {
-      final c = CdClass.publicData('Order', attributes: [
-        CdAttribute.public('orderID', 'String'),
-        CdAttribute.public('numberOfOrderedProducts', 'int'),
-        CdAttribute.public('totalCost', 'double'),
-      ]);
-      expect(c.visibility, CdVisibility.public);
-      expect(c.attributes.length, 3);
-      expect(c.isAbstract, isFalse);
+      final c = CdClass.publicData(
+        'Order',
+        attributes: [
+          CdAttribute.public('orderID', 'String'),
+          CdAttribute.public('numberOfOrderedProducts', 'int'),
+          CdAttribute.public('totalCost', 'double'),
+        ],
+      );
+      (c.visibility).should.be(CdVisibility.public);
+      c.attributes.should.haveCount(3);
+      c.isAbstract.should.beFalse();
     });
 
     test('Then abstract class', () {
       const c = CdClass(name: 'AbstractProcessor', isAbstract: true);
-      expect(c.isAbstract, isTrue);
+      c.isAbstract.should.beTrue();
     });
 
     test('Then class with superclass and interfaces', () {
@@ -809,8 +859,8 @@ void main() {
         superClass: 'Order',
         interfaces: ['Trackable', 'Auditable'],
       );
-      expect(c.superClass, 'Order');
-      expect(c.interfaces, contains('Trackable'));
+      (c.superClass).should.be('Order');
+      c.interfaces.should.contain('Trackable');
     });
   });
 
@@ -820,12 +870,13 @@ void main() {
         name: 'Trackable',
         methods: [
           CdMethod(
-              name: 'getTrackingNumber',
-              returnType: 'String',
-              visibility: CdVisibility.public),
+            name: 'getTrackingNumber',
+            returnType: 'String',
+            visibility: CdVisibility.public,
+          ),
         ],
       );
-      expect(iface.methods.length, 1);
+      iface.methods.should.haveCount(1);
     });
   });
 
@@ -839,9 +890,12 @@ void main() {
           CdEnumConstant('BANK_TRANSFER'),
         ],
       );
-      expect(e.constants.length, 3);
-      expect(e.constants.map((c) => c.name),
-          containsAll(['CREDIT_CARD', 'DEBIT_CARD', 'BANK_TRANSFER']));
+      e.constants.should.haveCount(3);
+      e.constants.map((c) => c.name).should.containAll([
+        'CREDIT_CARD',
+        'DEBIT_CARD',
+        'BANK_TRANSFER',
+      ]);
     });
   });
 
@@ -854,71 +908,91 @@ void main() {
         name: 'OrderToDelivery',
         package: PackagePath.parse('de.monticore.bpmn.cds'),
         classifiers: [
-          CdClass.publicData('InventoryAvailabilityChecker', attributes: [
-            CdAttribute.public('allProductsAvailable', 'boolean'),
-            CdAttribute.public('unavailableProducts', 'List<Product>'),
-          ]),
-          CdClass.publicData('Order', attributes: [
-            CdAttribute.public('orderID', 'String'),
-            CdAttribute.public('customerID', 'String'),
-            CdAttribute.public('numberOfOrderedProducts', 'int'),
-            CdAttribute.public('orderList', 'List<Product>'),
-            CdAttribute.public('checker', 'InventoryAvailabilityChecker'),
-            CdAttribute.public('totalCost', 'double'),
-          ]),
-          CdClass.publicData('Product', attributes: [
-            CdAttribute.public('productID', 'String'),
-            CdAttribute.public('name', 'String'),
-            CdAttribute.public('orderQuantity', 'int'),
-          ]),
-          CdClass.publicData('CustomerDeliveryAgreement', attributes: [
-            CdAttribute.public('customerID', 'String'),
-            CdAttribute.public('isOrderPickedUp', 'boolean'),
-            CdAttribute.public('address', 'DestinationAddress'),
-          ]),
-          CdClass.publicData('DestinationAddress', attributes: [
-            CdAttribute.public('street', 'String'),
-            CdAttribute.public('houseNumber', 'String'),
-            CdAttribute.public('postalCode', 'String'),
-            CdAttribute.public('city', 'String'),
-          ]),
-          CdClass.publicData('PaymentValidityChecker', attributes: [
-            CdAttribute.public('paymentValid', 'boolean'),
-            CdAttribute.public('cardNumberValid', 'boolean'),
-            CdAttribute.public('cardVerificationValueValid', 'boolean'),
-            CdAttribute.public('paymentMethod', 'String'),
-            CdAttribute.public('cardNumber', 'String'),
-            CdAttribute.public('cardVerificationValue', 'String'),
-            CdAttribute.public('cardExpirationDate', 'String'),
-          ]),
+          CdClass.publicData(
+            'InventoryAvailabilityChecker',
+            attributes: [
+              CdAttribute.public('allProductsAvailable', 'boolean'),
+              CdAttribute.public('unavailableProducts', 'List<Product>'),
+            ],
+          ),
+          CdClass.publicData(
+            'Order',
+            attributes: [
+              CdAttribute.public('orderID', 'String'),
+              CdAttribute.public('customerID', 'String'),
+              CdAttribute.public('numberOfOrderedProducts', 'int'),
+              CdAttribute.public('orderList', 'List<Product>'),
+              CdAttribute.public('checker', 'InventoryAvailabilityChecker'),
+              CdAttribute.public('totalCost', 'double'),
+            ],
+          ),
+          CdClass.publicData(
+            'Product',
+            attributes: [
+              CdAttribute.public('productID', 'String'),
+              CdAttribute.public('name', 'String'),
+              CdAttribute.public('orderQuantity', 'int'),
+            ],
+          ),
+          CdClass.publicData(
+            'CustomerDeliveryAgreement',
+            attributes: [
+              CdAttribute.public('customerID', 'String'),
+              CdAttribute.public('isOrderPickedUp', 'boolean'),
+              CdAttribute.public('address', 'DestinationAddress'),
+            ],
+          ),
+          CdClass.publicData(
+            'DestinationAddress',
+            attributes: [
+              CdAttribute.public('street', 'String'),
+              CdAttribute.public('houseNumber', 'String'),
+              CdAttribute.public('postalCode', 'String'),
+              CdAttribute.public('city', 'String'),
+            ],
+          ),
+          CdClass.publicData(
+            'PaymentValidityChecker',
+            attributes: [
+              CdAttribute.public('paymentValid', 'boolean'),
+              CdAttribute.public('cardNumberValid', 'boolean'),
+              CdAttribute.public('cardVerificationValueValid', 'boolean'),
+              CdAttribute.public('paymentMethod', 'String'),
+              CdAttribute.public('cardNumber', 'String'),
+              CdAttribute.public('cardVerificationValue', 'String'),
+              CdAttribute.public('cardExpirationDate', 'String'),
+            ],
+          ),
         ],
       );
     });
 
     test('Then has 6 classes', () {
-      expect(diagram.classes.length, 6);
+      diagram.classes.should.haveCount(6);
     });
 
     test('Then findClassifier finds Order', () {
       final c = diagram.findClassifier('Order');
-      expect(c, isNotNull);
-      expect(c!.name, 'Order');
+      c.should.not.beNull();
+      (c!.name).should.be('Order');
     });
 
     test('Then Order has 6 attributes', () {
       final order = diagram.findClassifier('Order') as CdClass;
-      expect(order.attributes.length, 6);
+      order.attributes.should.haveCount(6);
     });
 
     test('Then PaymentValidityChecker has allProductsAvailable-like field', () {
       final pvc = diagram.findClassifier('PaymentValidityChecker') as CdClass;
       final field = pvc.attributes.firstWhere((a) => a.name == 'paymentValid');
-      expect(field.type, 'boolean');
+      (field.type).should.be('boolean');
     });
 
     test('Then fullyQualifiedName is correct', () {
-      expect(diagram.fullyQualifiedName('Order'),
-          'de.monticore.bpmn.cds.OrderToDelivery.Order');
+      diagram
+          .fullyQualifiedName('Order')
+          .should
+          .be('de.monticore.bpmn.cds.OrderToDelivery.Order');
     });
   });
 
@@ -935,67 +1009,89 @@ void main() {
             attributes: [
               CdAttribute(name: 'hiringDate', type: 'java.time.ZonedDateTime'),
               CdAttribute(
-                  name: 'version',
-                  type: 'int',
-                  visibility: CdVisibility.public),
+                name: 'version',
+                type: 'int',
+                visibility: CdVisibility.public,
+              ),
             ],
           ),
           const CdClass(name: 'DomainUser'),
-          CdClass.publicData('Report', attributes: [
-            CdAttribute.public('result', 'String'),
-            CdAttribute.public('details', 'String'),
-          ]),
+          CdClass.publicData(
+            'Report',
+            attributes: [
+              CdAttribute.public('result', 'String'),
+              CdAttribute.public('details', 'String'),
+            ],
+          ),
           const CdClass(name: 'LeaveCard'),
           CdClass(
             name: 'LeaveEntry',
             attributes: [
               const CdAttribute(
-                  name: 'startDate', type: 'java.time.ZonedDateTime'),
+                name: 'startDate',
+                type: 'java.time.ZonedDateTime',
+              ),
               const CdAttribute(
-                  name: 'endDate', type: 'java.time.ZonedDateTime'),
+                name: 'endDate',
+                type: 'java.time.ZonedDateTime',
+              ),
               CdAttribute.derived('workingDays', 'int'),
               CdAttribute.derived('remainingLeaveDays', 'int'),
               const CdAttribute(name: 'valid', type: 'boolean'),
               const CdAttribute(name: 'approved', type: 'boolean'),
             ],
           ),
-          CdClass.publicData('MedicalCertificate', attributes: [
-            const CdAttribute(
-                name: 'startDate', type: 'java.time.ZonedDateTime'),
-            const CdAttribute(name: 'endDate', type: 'java.time.ZonedDateTime'),
-            CdAttribute.public('description', 'String'),
-          ]),
+          CdClass.publicData(
+            'MedicalCertificate',
+            attributes: [
+              const CdAttribute(
+                name: 'startDate',
+                type: 'java.time.ZonedDateTime',
+              ),
+              const CdAttribute(
+                name: 'endDate',
+                type: 'java.time.ZonedDateTime',
+              ),
+              CdAttribute.public('description', 'String'),
+            ],
+          ),
         ],
         associations: [
           CdAssociation.oneToMany(source: 'DomainUser', target: 'Contract'),
           CdAssociation.oneToMany(
-              source: 'LeaveCard', target: 'LeaveEntry', roleName: 'entries'),
+            source: 'LeaveCard',
+            target: 'LeaveEntry',
+            roleName: 'entries',
+          ),
           CdAssociation.oneToOne(source: 'LeaveCard', target: 'DomainUser'),
         ],
       );
     });
 
     test('Then has 6 classifiers', () {
-      expect(diagram.classifiers.length, 6);
+      diagram.classifiers.should.haveCount(6);
     });
 
     test('Then LeaveEntry has derived attributes', () {
       final le = diagram.findClassifier('LeaveEntry') as CdClass;
       final derived = le.attributes.where((a) => a.isDerived).toList();
-      expect(derived.length, 2);
-      expect(derived.map((a) => a.name),
-          containsAll(['workingDays', 'remainingLeaveDays']));
+      derived.should.haveCount(2);
+      derived.map((a) => a.name).should.containAll([
+        'workingDays',
+        'remainingLeaveDays',
+      ]);
     });
 
     test('Then has 3 associations', () {
-      expect(diagram.associations.length, 3);
+      diagram.associations.should.haveCount(3);
     });
 
     test('Then entries association has role name', () {
-      final assoc =
-          diagram.associations.firstWhere((a) => a.roleName == 'entries');
-      expect(assoc.sourceType, 'LeaveCard');
-      expect(assoc.targetType, 'LeaveEntry');
+      final assoc = diagram.associations.firstWhere(
+        (a) => a.roleName == 'entries',
+      );
+      (assoc.sourceType).should.be('LeaveCard');
+      (assoc.targetType).should.be('LeaveEntry');
     });
   });
 
@@ -1006,39 +1102,38 @@ void main() {
   group('Given WorkflowFailure', () {
     test('Then DeadNode message', () {
       const f = DeadNode(NodeId('OrphanTask'));
-      expect(f.message, contains('OrphanTask'));
-      expect(f.message, contains('unreachable'));
+      f.message.should.contain('OrphanTask');
+      f.message.should.contain('unreachable');
     });
 
     test('Then MergeGatewayTooFewIncomingFlows message', () {
       const f = MergeGatewayTooFewIncomingFlows(
-          gatewayId: NodeId('MergeWork'), found: 1);
-      expect(f.message, contains('MergeWork'));
-      expect(f.message, contains('1 incoming'));
+        gatewayId: NodeId('MergeWork'),
+        found: 1,
+      );
+      f.message.should.contain('MergeWork');
+      f.message.should.contain('1 incoming');
     });
 
     test('Then LackOfSync message', () {
       const f = LackOfSync(NodeId('MergeWork'));
-      expect(f.message, contains('MergeWork'));
-      expect(f.message, contains('XOR'));
+      f.message.should.contain('MergeWork');
+      f.message.should.contain('XOR');
     });
 
     test('Then ParallelBranchesClosedWithXor message', () {
       const f = ParallelBranchesClosedWithXor(
         mergeGatewayId: NodeId('MergeWork'),
-        parallelBranch: [
-          NodeId('Introduction'),
-          NodeId('MergeWork'),
-        ],
+        parallelBranch: [NodeId('Introduction'), NodeId('MergeWork')],
       );
-      expect(f.message, contains('MergeWork'));
-      expect(f.message, contains('XOR'));
+      f.message.should.contain('MergeWork');
+      f.message.should.contain('XOR');
     });
 
     test('Then TaskNotIncarnated message', () {
       const f = TaskNotIncarnated(NodeId('LiteratureReview'));
-      expect(f.message, contains('LiteratureReview'));
-      expect(f.message, contains('reference model'));
+      f.message.should.contain('LiteratureReview');
+      f.message.should.contain('reference model');
     });
 
     test('Then UnresolvedNodeReference message', () {
@@ -1046,26 +1141,26 @@ void main() {
         referencedNode: NodeId('MissingNode'),
         fromFlow: NodeId('flow1'),
       );
-      expect(f.message, contains('MissingNode'));
-      expect(f.message, contains('undefined'));
+      f.message.should.contain('MissingNode');
+      f.message.should.contain('undefined');
     });
 
     test('Then ProcessNotSound message', () {
       const f = ProcessNotSound('path from start cannot reach end event');
-      expect(f.message, contains('not sound'));
+      f.message.should.contain('not sound');
     });
 
     test('Then InfiniteLoop message', () {
       const f = InfiniteLoop([NodeId('A'), NodeId('B'), NodeId('A')]);
-      expect(f.message, contains('A → B → A'));
+      f.message.should.contain('A → B → A');
     });
 
     test('Then failures are equatable', () {
       const a = DeadNode(NodeId('X'));
       const b = DeadNode(NodeId('X'));
       const c = DeadNode(NodeId('Y'));
-      expect(a, equals(b));
-      expect(a, isNot(equals(c)));
+      a.should.be(b);
+      a.should.not.be(c);
     });
   });
 }
