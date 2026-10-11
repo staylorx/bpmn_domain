@@ -28,3 +28,8 @@ doc/api*/
 
 .flutter-plugins
 .flutter-plugins-dependencies
+
+# IDE / editor noise (doctrine-recommended; cosmetic)
+.idea/
+*.iml
+.vscode/

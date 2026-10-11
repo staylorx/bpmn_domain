@@ -20,3 +20,46 @@ dev_dependencies:
   test: ^1.25.6
   mocktail: ^1.0.4
   shouldly: ^0.5.0+1
+  melos: ^8.8.0
+
+melos:
+  # Topology C (single-package workspace): the root pubspec is itself the only
+  # package, so it acts as its own melos workspace without a workspace: list.
+  useRootAsPackage: true
+  scripts:
+    analyze:
+      description: Run static analysis on the package (matches the CI gate)
+      run: dart analyze --fatal-infos --fatal-warnings
+
+    format:
+      description: Check formatting (no changes applied)
+      run: dart format --output=none --set-exit-if-changed .
+
+    format:fix:
+      description: Apply dart format
+      run: dart format .
+
+    test:
+      description: Run tests across the package
+      run: dart test
+      concurrency: 1
+      failFast: true
+
+    clean:
+      description: Clean the workspace then re-bootstrap
+      steps:
+        - melos clean
+        - melos bs
+
+    clean:deep:
+      description: Nuclear clean — removes everything not tracked by git (git clean -fdx), then re-bootstraps
+      steps:
+        - git clean -fdx
+        - melos bs
+
+    verify:
+      description: Run all checks (analyze, format, test) for CI
+      steps:
+        - melos run analyze
+        - melos run format
+        - melos run test

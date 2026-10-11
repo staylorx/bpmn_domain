@@ -1,6 +1,3 @@
-// TODO(dart_arch_test): Add the boundary-direction + cycle-freedom
-// architecture test (dart_arch_test) per ADR-001 when a second package
-// (the roadmapped parser/validator) lands in this repo.
 import 'package:bpmn_domain/bpmn_domain.dart';
 import 'package:shouldly/shouldly.dart';
 import 'package:test/test.dart';
