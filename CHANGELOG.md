@@ -42,7 +42,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Nothing yet.
+- `EquatableMixin` → `Equatable` across the entity, value-object and failure
+  tree, resolving the `equatable` 2.1.0 deprecation and the 61 ×
+  `deprecated_member_use` analyzer gate RED (commit `91d6033`).
+- Non-conforming single-positional constructors converted to `required` named
+  parameters per ADR-0003 (`d66e8db`); the positional grace names (`NodeId`,
+  `CronTimerCondition`, `FlowTarget.element`) stay.
+
+### Changed
+
+- Test suite converted to the shouldly assertion idiom (`213` `should.` calls,
+  no `expect()` mixing) and grouped as Given/When/Then, closing the two
+  test-idiom deviations.
+- `README.md` trimmed to an orientation-only document per ADR-0002; the
+  architecture prose and roadmap moved to `docs/roadmap.md`.
+- Error style declared in `AGENTS.md` (bible §4): this package returns immutable
+  data plus a sealed failure tree — no `Either`; the package is
+  silent-compliant until a value-returning layer exists.
+- `dart_arch_test` boundary test deferred per ADR-001 until a second package is
+  added; a `TODO(dart_arch_test)` placeholder sits in the test file.
 
 ### Notes
 
