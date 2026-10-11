@@ -188,6 +188,21 @@ do not auto-fix. Line references are to `main` @ `c44dbff`.
   recorded in `docs/architecture/adr-001-dart-arch-test.md`; `TODO(dart_arch_test)`
   placed in `test/bpmn_domain_test.dart` per ADR-001.
 
+- Deviation: `lib/src/entities/**`, `lib/src/value_objects/**`, `lib/src/cd/**`,
+  `lib/src/failures/workflow_failure.dart` - **single-positional constructors:
+  RESOLVED (CONVERT) — not a sanctioned deviation.** The audit (`t_0cecd5fc`)
+  catalogued **62 single-positional constructors** against Bible §2.5 ("named
+  parameters, always — except a single positional named `ref`, `message`, or
+  `value`"). Three already conform via the grace names and **stay positional**:
+  `NodeId(this.value)`, `CronTimerCondition(this.value)`,
+  `FlowTarget.element(NodeId ref, …)` (214 combined call sites untouched). All
+  remaining non-conforming single-positional constructors — **43** in
+  entities/value_objects/cd plus **19** `WorkflowFailure` leaves — **CONVERT** to
+  `required` named parameters: a conformance migration, not a parked deviation.
+  Full per-constructor migration spec (parameter names + new signatures) is in
+  `docs/adr/0003-single-positional-constructors-named.md` (decision `t_b18be688`,
+  implementation `t_d7d37d5f`).
+
 - Deviation: `pubspec.yaml` (no root/`workspace:`) - the bible's workspace model
   (§2/§9.2-4) assumes a root pubspec with a `workspace:` list and
   `resolution: workspace` in each member. This repo is a **standalone single
