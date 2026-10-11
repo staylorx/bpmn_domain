@@ -44,15 +44,7 @@ Problems found:
   version (0.1.0)"*. Fixed in this pass (see `CHANGELOG.md`); recorded here so the
   `--dry-run` warning is not mistaken for a one-off.
 
-- **No CI workflow.** `.github/` does not exist, so nothing runs
-  `dart analyze` / `dart test` on push or PR — the red analyze gate above was
-  free to land. §9.10 makes CI (analyze + test across every package) part of the
-  bootstrap checklist. **Recommendation: add a `dart analyze --fatal-infos
-  --fatal-warnings` + `dart test` workflow.**
-
-- **No `dart_arch_test` boundary test, and no workspace root.** The repo is a
-  single package with no root `pubspec.yaml` `workspace:` list and no
-  architecture test. Related deviation below.
+- **`dart_arch_test` boundary test** (see below).
 
 - **No `AGENTS.md`.** The repo carries no agent-facing conventions file and does
   not declare its error style anywhere; see the error-style deviation below.

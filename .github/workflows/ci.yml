@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-test:
+    name: Analyze & test (Dart ${{ matrix.sdk }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Lower floor == the exercised version == what the lockfile resolves to.
+        # Pin both here so CI is deterministic ("lock pinning").
+        sdk: [3.13.1]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Resolve dependencies
+        run: dart pub get
+
+      - name: Analyze
+        run: dart analyze --fatal-infos --fatal-warnings
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Test
+        run: dart test

@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `.github/workflows/ci.yml` — CI runs on every push to `main` and on each PR,
+  pinned to the Dart 3.13.1 SDK (matching the raised `environment.sdk` floor and
+  the resolved lockfile). Gate: `dart pub get` → `dart analyze
+  --fatal-infos --fatal-warnings` → `dart format` (set-exit-if-changed) →
+  `dart test`. Previously `.github/` did not exist, so nothing ran analyze/test
+  on push or PR.
+- `pubspec.lock` — now tracked (unchanged content) for reproducible CI, and
+  `.gitignore` no longer excludes it. This package is `publish_to: none`, so
+  committing the lock never leaks a publish-time constraint.
 - `BACKLOG.md` — open/pending items only. Records the Windows-lane build/audit
   findings (Dart SDK 3.13.1) and every divergence between this repo and the
   Dart/Flutter Bible (`staylorx/dart-flutter-bible`, `docs/` §1–§12), each as a
