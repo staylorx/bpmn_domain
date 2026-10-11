@@ -179,6 +179,14 @@ do not auto-fix. Line references are to `main` @ `c44dbff`.
   (B is core + UI, not core + adapters + a remote core). The boundary test is the
   thing that would catch the split going wrong. Flagged for the workspace-level
   decision, not for this package.
+  **STATUS: DEFERRED — see ADR-001 (decision t_0e301f78).** Decision
+  (2026-10-11): do not add a `dart_arch_test` boundary/cycle test now; the test
+  would be vacuous while this repo is a single package with one barrel and no
+  cross-package edge to assert. Deferred until a second package is added to this
+  repo (the roadmapped parser/validator landing in their own Dart package).
+  Trigger + eventual assertions (inward-only boundary direction, cycle freedom)
+  recorded in `docs/architecture/adr-001-dart-arch-test.md`; `TODO(dart_arch_test)`
+  placed in `test/bpmn_domain_test.dart` per ADR-001.
 
 - Deviation: `pubspec.yaml` (no root/`workspace:`) - the bible's workspace model
   (§2/§9.2-4) assumes a root pubspec with a `workspace:` list and
