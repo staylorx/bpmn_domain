@@ -95,10 +95,16 @@ do not auto-fix. Line references are to `main` @ `c44dbff`.
   `event.dart` 4, `subprocess.dart` 4, `cd_association.dart` 3, `process.dart` 3,
   `stereotype.dart` 3, `task.dart` 3, and `cd_class_diagram.dart`, `cd_method.dart`,
   `data_object.dart`, `node_id.dart` 2 each. §2/§1 (compact) say one class per
-  file. Flagged for review: the grouping is *thematic* (all timer conditions
-  together, the whole failure hierarchy together) and arguably more navigable
-  than 28 single-class files — the bible may be wrong here, or it may intend
-  "one class per file" only for non-trivial types.
+  file. **STATUS: SANCTIONED for sealed-family files.** The 7 files hosting a
+  `sealed` parent + its leaf subclasses (`workflow_failure.dart`, `gateway.dart`,
+  `event_trigger.dart`, `timer_condition.dart`, `sequence_flow.dart`,
+  `io_requirement.dart`, `loop_characteristic.dart`) **cannot be split** — Dart's
+  same-library rule requires every direct subtype of a `sealed` class to live in
+  the same file as the parent, and un-sealing would break the exhaustive-switch
+  guarantee the Bible itself requires (§4). See **ADR-0001**
+  (`docs/adr/0001-sealed-family-file-grouping.md`) for the full decision and
+  rationale; the unsealed non-family multi-class files are NOT covered by this
+  sanction and remain one-class-per-file candidates.
 
 - Deviation: `test/bpmn_domain_test.dart` (the sole test file) - **every test
   uses `expect()` from `package:test`; no test imports `shouldly`.** §6: shouldly
@@ -173,8 +179,9 @@ do not auto-fix. Line references are to `main` @ `c44dbff`.
   section caps every doc at 1–2 lines — which would cut the grammar tables and
   DSL examples that make this package usable. Decide: shrink to doctrine, or
   propose the bible allow richer docs for a domain-model package.
-- **One class per file — apply, or propose the exemption?** 20/27 files violate
-  it; the grouping is thematic and reads better, but the bible is unambiguous.
+- **One class per file — DECIDED (ADR-0001).** Sealed-family files stay grouped
+  (sanctioned, `docs/adr/0001-sealed-family-file-grouping.md`); the unsealed
+  multi-class files remain candidates for a separate one-class-per-file pass.
 - **Is `fpdart` load-bearing here?** If the entity package is genuinely
   operation-free, drop the dependency; if the CoCo validators live here, they
   should return `Either<WorkflowFailure, …>` and the pin earns its place.

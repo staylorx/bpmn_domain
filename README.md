@@ -498,3 +498,11 @@ Given a concrete `WfProcess` and a reference `WfProcess`, check that:
 - The gateway structure does not violate conformance rules (e.g. `ParallelBranchesClosedWithXor`).
 
 Returns `Either<List<WorkflowFailure>, ConformanceReport>`.
+
+## Documentation
+
+Architecture decisions and doctrine deviations are recorded as ADRs in
+`docs/adr/`:
+
+- `0001-sealed-family-file-grouping.md` — keeps grouped sealed-family files as a
+  sanctioned (language-mandated) exception to "one class per file".
