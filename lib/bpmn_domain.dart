@@ -1,9 +1,14 @@
-library;
-
 /// BPMN Domain — clean-architecture domain entities for BPMN 2.0 Workflow DSL.
 ///
 /// This library provides the complete domain model for parsing and working
 /// with MontiCore Workflow DSL (`.wfm`) and Class Diagram (`.cd`) files.
+///
+/// ## Error style
+///
+/// This package throws nothing and returns no plain-error tuples: every public
+/// seam presents FP-style tuples as `Future<Either<WorkflowFailure, T>>`
+/// (no `TaskEither` handed un-run, no exception raised across a seam). Failures
+/// are the sealed [WorkflowFailure] hierarchy.
 ///
 /// ## Workflow model entities
 ///
@@ -44,6 +49,8 @@ library;
 ///
 /// - [WorkflowFailure] and subclasses — typed domain-level validation failures
 ///   corresponding to MontiCore CoCo violations.
+library;
+
 // Value objects
 export 'src/value_objects/node_id.dart';
 export 'src/value_objects/package_path.dart';
