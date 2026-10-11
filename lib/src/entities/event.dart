@@ -207,21 +207,21 @@ class WfEvent extends Equatable implements FlowElement {
   // Convenience constructors ---------------------------------------------------
 
   /// A simple **none start** event (no trigger).
-  factory WfEvent.start(String name) => WfEvent(
+  factory WfEvent.start({required String name}) => WfEvent(
     id: NodeId(name),
     role: EventRole.start,
     direction: EventDirection.catch_,
   );
 
   /// A simple **none end** event (no trigger).
-  factory WfEvent.end(String name) => WfEvent(
+  factory WfEvent.end({required String name}) => WfEvent(
     id: NodeId(name),
     role: EventRole.end,
     direction: EventDirection.throw_,
   );
 
   /// A **terminate end** event that cancels all active branches.
-  factory WfEvent.terminate(String name) => WfEvent(
+  factory WfEvent.terminate({required String name}) => WfEvent(
     id: NodeId(name),
     role: EventRole.end,
     direction: EventDirection.throw_,
@@ -229,7 +229,7 @@ class WfEvent extends Equatable implements FlowElement {
   );
 
   /// A simple **none intermediate** event (marker in the flow).
-  factory WfEvent.intermediate(String name) =>
+  factory WfEvent.intermediate({required String name}) =>
       WfEvent(id: NodeId(name), role: EventRole.intermediate);
 
   /// A **message catch start** event — the process starts when a message

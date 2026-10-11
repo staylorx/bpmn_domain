@@ -82,10 +82,11 @@ class WfDataSet extends Equatable {
   final List<WfDataIO> items;
 
   /// Creates a [WfDataSet] containing the given [items].
-  const WfDataSet(this.items);
+  const WfDataSet({required this.items});
 
   /// Creates a data set with a single item.
-  factory WfDataSet.single(WfDataIO item) => WfDataSet([item]);
+  factory WfDataSet.single({required WfDataIO item}) =>
+      WfDataSet(items: [item]);
 
   @override
   List<Object?> get props => [items];
@@ -131,13 +132,17 @@ final class WfIOSet extends WfIORequirement with EquatableMixin {
   /// Convenience: create an input I/O set with one named, typed item.
   factory WfIOSet.inputItem(String name, WfTypeRef type) => WfIOSet(
     isInput: true,
-    dataSet: WfDataSet.single(WfDataIO(name: NodeId(name), type: type)),
+    dataSet: WfDataSet.single(
+      item: WfDataIO(name: NodeId(name), type: type),
+    ),
   );
 
   /// Convenience: create an output I/O set with one named, typed item.
   factory WfIOSet.outputItem(String name, WfTypeRef type) => WfIOSet(
     isInput: false,
-    dataSet: WfDataSet.single(WfDataIO(name: NodeId(name), type: type)),
+    dataSet: WfDataSet.single(
+      item: WfDataIO(name: NodeId(name), type: type),
+    ),
   );
 
   @override

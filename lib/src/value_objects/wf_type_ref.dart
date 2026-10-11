@@ -26,19 +26,20 @@ class WfTypeRef extends Equatable {
   final String expression;
 
   /// Creates a [WfTypeRef] wrapping [expression]; must be non-empty.
-  const WfTypeRef(this.expression) : assert(expression != '');
+  const WfTypeRef({required this.expression}) : assert(expression != '');
 
   /// Creates a [WfTypeRef] for a plain named type.
-  factory WfTypeRef.named(String name) => WfTypeRef(name);
+  factory WfTypeRef.named({required String name}) =>
+      WfTypeRef(expression: name);
 
   /// The well-known `String` built-in type.
-  static const WfTypeRef string = WfTypeRef('String');
+  static const WfTypeRef string = WfTypeRef(expression: 'String');
 
   /// The well-known `int` built-in type.
-  static const WfTypeRef integer = WfTypeRef('int');
+  static const WfTypeRef integer = WfTypeRef(expression: 'int');
 
   /// The well-known `bool` built-in type.
-  static const WfTypeRef boolean = WfTypeRef('bool');
+  static const WfTypeRef boolean = WfTypeRef(expression: 'bool');
 
   @override
   List<Object?> get props => [expression];

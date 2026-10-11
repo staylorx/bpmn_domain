@@ -43,11 +43,11 @@ class QualifiedNodeId extends Equatable {
   final List<String> segments;
 
   /// Creates a [QualifiedNodeId] from its path [segments]; must be non-empty.
-  const QualifiedNodeId(this.segments) : assert(segments.length > 0);
+  const QualifiedNodeId({required this.segments}) : assert(segments.length > 0);
 
   /// Creates a [QualifiedNodeId] from a dot-separated string.
-  factory QualifiedNodeId.parse(String dotSeparated) =>
-      QualifiedNodeId(dotSeparated.split('.'));
+  factory QualifiedNodeId.parse({required String dotSeparated}) =>
+      QualifiedNodeId(segments: dotSeparated.split('.'));
 
   /// The simple name — the last segment.
   String get simpleName => segments.last;

@@ -103,7 +103,7 @@ final class AtTimerCondition extends TimerCondition with EquatableMixin {
   final TimeOfDay time;
 
   /// Creates an [AtTimerCondition] that fires at [time] each day.
-  const AtTimerCondition(this.time);
+  const AtTimerCondition({required this.time});
 
   @override
   List<Object?> get props => [time];
@@ -165,7 +165,7 @@ final class AfterPeriodCondition extends TimerCondition with EquatableMixin {
   final String period;
 
   /// Creates an [AfterPeriodCondition] that fires after `period` elapses.
-  const AfterPeriodCondition(this.period);
+  const AfterPeriodCondition({required this.period});
 
   @override
   List<Object?> get props => [period];

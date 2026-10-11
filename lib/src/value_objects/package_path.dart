@@ -17,15 +17,15 @@ class PackagePath extends Equatable {
   final List<String> segments;
 
   /// Creates a [PackagePath] from its dot-separated [segments].
-  const PackagePath(this.segments);
+  const PackagePath({required this.segments});
 
   /// The top-level (root) package with no path segments.
-  static const PackagePath root = PackagePath([]);
+  static const PackagePath root = PackagePath(segments: []);
 
   /// Parses a dot-separated package string.  An empty string yields [root].
-  factory PackagePath.parse(String dotSeparated) {
+  factory PackagePath.parse({required String dotSeparated}) {
     if (dotSeparated.isEmpty) return root;
-    return PackagePath(dotSeparated.split('.'));
+    return PackagePath(segments: dotSeparated.split('.'));
   }
 
   /// Whether this is the unnamed root package.

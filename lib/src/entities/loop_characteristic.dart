@@ -58,7 +58,7 @@ final class WfStandardLoop extends LoopCharacteristic with EquatableMixin {
   });
 
   /// Creates a `while [condition]` loop.
-  factory WfStandardLoop.whileLoop(String condition, {int? max}) =>
+  factory WfStandardLoop.whileLoop({required String condition, int? max}) =>
       WfStandardLoop(
         isWhile: true,
         loopCondition: condition,
@@ -66,7 +66,7 @@ final class WfStandardLoop extends LoopCharacteristic with EquatableMixin {
       );
 
   /// Creates an `until [condition]` loop.
-  factory WfStandardLoop.untilLoop(String condition, {int? max}) =>
+  factory WfStandardLoop.untilLoop({required String condition, int? max}) =>
       WfStandardLoop(
         isWhile: false,
         loopCondition: condition,
@@ -124,15 +124,15 @@ class WfLoopCardinality extends Equatable {
        );
 
   /// Cardinality from a fixed integer.
-  factory WfLoopCardinality.count(int n) =>
+  factory WfLoopCardinality.count({required int n}) =>
       WfLoopCardinality._(literalCount: n);
 
   /// Cardinality from a runtime expression.
-  factory WfLoopCardinality.expression(String expr) =>
+  factory WfLoopCardinality.expression({required String expr}) =>
       WfLoopCardinality._(expression: expr);
 
   /// Cardinality from a named collection data object.
-  factory WfLoopCardinality.collection(String name) =>
+  factory WfLoopCardinality.collection({required String name}) =>
       WfLoopCardinality._(collectionName: name);
 
   @override
@@ -282,14 +282,16 @@ final class WfMILoop extends LoopCharacteristic with EquatableMixin {
   });
 
   /// Creates a parallel multi-instance loop over a named collection.
-  factory WfMILoop.parallelOver(String collectionName) => WfMILoop(
-    cardinality: WfLoopCardinality.collection(collectionName),
+  factory WfMILoop.parallelOver({required String collectionName}) => WfMILoop(
+    cardinality: WfLoopCardinality.collection(name: collectionName),
     isParallel: true,
   );
 
   /// Creates a sequential multi-instance loop with a literal count.
-  factory WfMILoop.sequential(int count) =>
-      WfMILoop(cardinality: WfLoopCardinality.count(count), isParallel: false);
+  factory WfMILoop.sequential({required int count}) => WfMILoop(
+    cardinality: WfLoopCardinality.count(n: count),
+    isParallel: false,
+  );
 
   @override
   List<Object?> get props => [

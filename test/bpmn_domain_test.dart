@@ -29,7 +29,7 @@ void main() {
   group('Given QualifiedNodeId', () {
     test('Then parse splits on dots', () {
       final q = QualifiedNodeId.parse(
-        'de.monticore.bpmn.examples.OrderToDeliveryWorkflow',
+        dotSeparated: 'de.monticore.bpmn.examples.OrderToDeliveryWorkflow',
       );
       q.segments.should.haveCount(5);
       (q.simpleName).should.be('OrderToDeliveryWorkflow');
@@ -37,7 +37,7 @@ void main() {
     });
 
     test('Then toString rejoins segments', () {
-      final q = QualifiedNodeId(['de', 'pkg', 'MyProcess']);
+      final q = QualifiedNodeId(segments: ['de', 'pkg', 'MyProcess']);
       (q.toString()).should.be('de.pkg.MyProcess');
     });
   });
@@ -49,12 +49,12 @@ void main() {
     });
 
     test('Then parse produces correct segments', () {
-      final p = PackagePath.parse('de.monticore.bpmn.examples');
+      final p = PackagePath.parse(dotSeparated: 'de.monticore.bpmn.examples');
       (p.segments).should.be(['de', 'monticore', 'bpmn', 'examples']);
     });
 
     test('Then qualify prepends package', () {
-      final p = PackagePath.parse('de.monticore.bpmn.examples');
+      final p = PackagePath.parse(dotSeparated: 'de.monticore.bpmn.examples');
       p
           .qualify('OrderToDeliveryWorkflow')
           .should
@@ -68,7 +68,7 @@ void main() {
 
   group('Given Stereotype', () {
     test('Then incarnates factory', () {
-      final s = Stereotype.incarnates('Research');
+      final s = Stereotype.incarnates(referenceName: 'Research');
       (s.key).should.be('incarnates');
       (s.value).should.be('Research');
       (s.toString()).should.be('<<incarnates="Research">>');
@@ -87,7 +87,9 @@ void main() {
     });
 
     test('Then incarnatesTarget is extracted correctly', () {
-      final mod = WfModifier(stereotypes: [Stereotype.incarnates('Draft')]);
+      final mod = WfModifier(
+        stereotypes: [Stereotype.incarnates(referenceName: 'Draft')],
+      );
       mod.isIncarnation.should.beTrue();
       (mod.incarnatesTarget).should.be('Draft');
     });
@@ -95,8 +97,8 @@ void main() {
 
   group('Given WfTypeRef', () {
     test('Then equality is structural', () {
-      WfTypeRef.string.should.be(const WfTypeRef('String'));
-      WfTypeRef.named('Order').should.be(WfTypeRef.named('Order'));
+      WfTypeRef.string.should.be(const WfTypeRef(expression: 'String'));
+      WfTypeRef.named(name: 'Order').should.be(WfTypeRef.named(name: 'Order'));
     });
   });
 
@@ -127,20 +129,20 @@ void main() {
 
   group('Given WfGateway', () {
     test('Then splitXor factory', () {
-      final g = WfGateway.splitXor('OrderFulfillable');
+      final g = WfGateway.splitXor(name: 'OrderFulfillable');
       (g.id).should.be(const NodeId('OrderFulfillable'));
       (g.direction).should.be(GatewayDirection.split);
       g.kind.should.beOfType<ExclusiveGateway>();
     });
 
     test('Then mergeAnd factory', () {
-      final g = WfGateway.mergeAnd('MergeWork');
+      final g = WfGateway.mergeAnd(name: 'MergeWork');
       (g.direction).should.be(GatewayDirection.merge);
       g.kind.should.beOfType<ParallelGateway>();
     });
 
     test('Then splitReceiveFirst is event-based', () {
-      final g = WfGateway.splitReceiveFirst('WaitForResponse');
+      final g = WfGateway.splitReceiveFirst(name: 'WaitForResponse');
       g.kind.should.beOfType<ExclusiveEventGateway>();
     });
 
@@ -154,8 +156,8 @@ void main() {
     });
 
     test('Then equality is structural', () {
-      final a = WfGateway.splitXor('G');
-      final b = WfGateway.splitXor('G');
+      final a = WfGateway.splitXor(name: 'G');
+      final b = WfGateway.splitXor(name: 'G');
       a.should.be(b);
     });
   });
@@ -234,7 +236,7 @@ void main() {
 
   group('Given WfEvent', () {
     test('Then start factory creates catching start', () {
-      final e = WfEvent.start('ReceiveOrder');
+      final e = WfEvent.start(name: 'ReceiveOrder');
       (e.id).should.be(const NodeId('ReceiveOrder'));
       (e.role).should.be(EventRole.start);
       (e.direction).should.be(EventDirection.catch_);
@@ -243,14 +245,14 @@ void main() {
     });
 
     test('Then end factory creates throwing end', () {
-      final e = WfEvent.end('OrderCompleted');
+      final e = WfEvent.end(name: 'OrderCompleted');
       (e.role).should.be(EventRole.end);
       (e.direction).should.be(EventDirection.throw_);
       e.isEnd.should.beTrue();
     });
 
     test('Then terminate end event', () {
-      final e = WfEvent.terminate('ProcessAborted');
+      final e = WfEvent.terminate(name: 'ProcessAborted');
       e.trigger.should.beOfType<TerminateTrigger>();
     });
 
@@ -296,7 +298,7 @@ void main() {
 
   group('Given LoopCharacteristic', () {
     test('Then WfStandardLoop while', () {
-      final l = WfStandardLoop.whileLoop('retries < 3', max: 5);
+      final l = WfStandardLoop.whileLoop(condition: 'retries < 3', max: 5);
       l.isWhile.should.beTrue();
       (l.loopCondition).should.be('retries < 3');
       (l.maxIterations).should.be(5);
@@ -304,37 +306,39 @@ void main() {
     });
 
     test('Then WfStandardLoop until', () {
-      final l = WfStandardLoop.untilLoop('delivered == true');
+      final l = WfStandardLoop.untilLoop(condition: 'delivered == true');
       l.isWhile.should.beFalse();
       (l.toString()).should.be('until [delivered == true]');
     });
 
     test('Then WfLoopCardinality literal', () {
-      final c = WfLoopCardinality.count(5);
+      final c = WfLoopCardinality.count(n: 5);
       (c.literalCount).should.be(5);
       (c.toString()).should.be('count 5');
     });
 
     test('Then WfLoopCardinality expression', () {
-      final c = WfLoopCardinality.expression('order.numberOfOrderedProducts');
+      final c = WfLoopCardinality.expression(
+        expr: 'order.numberOfOrderedProducts',
+      );
       (c.expression).should.be('order.numberOfOrderedProducts');
       (c.toString()).should.be('count [order.numberOfOrderedProducts]');
     });
 
     test('Then WfLoopCardinality collection', () {
-      final c = WfLoopCardinality.collection('orderItems');
+      final c = WfLoopCardinality.collection(name: 'orderItems');
       (c.collectionName).should.be('orderItems');
       (c.toString()).should.be('count orderItems');
     });
 
     test('Then WfMILoop parallel over collection', () {
-      final l = WfMILoop.parallelOver('orderItems');
+      final l = WfMILoop.parallelOver(collectionName: 'orderItems');
       l.isParallel.should.beTrue();
       (l.cardinality.collectionName).should.be('orderItems');
     });
 
     test('Then WfMILoop sequential', () {
-      final l = WfMILoop.sequential(3);
+      final l = WfMILoop.sequential(count: 3);
       l.isParallel.should.beFalse();
       (l.cardinality.literalCount).should.be(3);
     });
@@ -342,7 +346,7 @@ void main() {
 
   group('Given WfTask', () {
     test('Then generic task factory', () {
-      final t = WfTask.generic('Introduction');
+      final t = WfTask.generic(name: 'Introduction');
       (t.id.value).should.be('Introduction');
       (t.type).should.be(TaskType.generic);
       t.hasBoundaryEvents.should.beFalse();
@@ -389,7 +393,9 @@ void main() {
     test('Then incarnated task', () {
       final t = WfTask(
         id: const NodeId('LiteratureReview'),
-        modifier: WfModifier(stereotypes: [Stereotype.incarnates('Research')]),
+        modifier: WfModifier(
+          stereotypes: [Stereotype.incarnates(referenceName: 'Research')],
+        ),
       );
       t.isIncarnation.should.beTrue();
       (t.incarnatesTarget).should.be('Research');
@@ -401,7 +407,7 @@ void main() {
         webservice: '##webservice',
         loop: WfMILoop(
           cardinality: WfLoopCardinality.expression(
-            'order.numberOfOrderedProducts',
+            expr: 'order.numberOfOrderedProducts',
           ),
           isParallel: true,
         ),
@@ -412,19 +418,19 @@ void main() {
 
   group('Given WfSubProcess', () {
     test('Then embedded subprocess', () {
-      final sp = WfSubProcess.embedded('ShipOrder');
+      final sp = WfSubProcess.embedded(name: 'ShipOrder');
       (sp.subProcessType).should.be(SubProcessType.embedded);
       sp.isTransaction.should.beFalse();
     });
 
     test('Then transaction subprocess', () {
-      final sp = WfSubProcess.transaction('PaymentBlock');
+      final sp = WfSubProcess.transaction(name: 'PaymentBlock');
       sp.isTransaction.should.beTrue();
     });
 
     test('Then adhoc subprocess', () {
       final sp = WfSubProcess.adhoc(
-        'PeerReview',
+        name: 'PeerReview',
         completionCondition: 'allReviewed',
         parallel: true,
       );
@@ -451,23 +457,28 @@ void main() {
 
   group('Given WfIORequirement', () {
     test('Then WfIOSet input', () {
-      final s = WfIOSet.inputItem('order', WfTypeRef.named('Order'));
+      final s = WfIOSet.inputItem('order', WfTypeRef.named(name: 'Order'));
       s.isInput.should.beTrue();
       (s.dataSet.items.first.name.value).should.be('order');
       (s.dataSet.items.first.type?.expression).should.be('Order');
     });
 
     test('Then WfIOSet output', () {
-      final s = WfIOSet.outputItem('report', WfTypeRef.named('PDF'));
+      final s = WfIOSet.outputItem('report', WfTypeRef.named(name: 'PDF'));
       s.isInput.should.beFalse();
     });
 
     test('Then WfIORule', () {
       final rule = WfIORule(
         inputSet: WfDataSet.single(
-          WfDataIO(name: const NodeId('order'), type: WfTypeRef.named('Order')),
+          item: WfDataIO(
+            name: const NodeId('order'),
+            type: WfTypeRef.named(name: 'Order'),
+          ),
         ),
-        outputSet: WfDataSet.single(const WfDataIO(name: NodeId('invoice'))),
+        outputSet: WfDataSet.single(
+          item: const WfDataIO(name: NodeId('invoice')),
+        ),
       );
       (rule.inputSet.items.first.name.value).should.be('order');
       (rule.outputSet.items.first.name.value).should.be('invoice');
@@ -476,7 +487,7 @@ void main() {
     test('Then WfDataIO loop flag', () {
       final d = WfDataIO(
         name: const NodeId('items'),
-        type: WfTypeRef.named('Product'),
+        type: WfTypeRef.named(name: 'Product'),
         loop: true,
       );
       d.loop.should.beTrue();
@@ -520,7 +531,7 @@ void main() {
     test('Then error notification', () {
       final n = WfNotification.error(
         'CardDeclinedError',
-        WfTypeRef.named('CardError'),
+        WfTypeRef.named(name: 'CardError'),
       );
       n.isError.should.beTrue();
     });
@@ -528,7 +539,7 @@ void main() {
     test('Then signal notification', () {
       final n = WfNotification.signal(
         'IncidentResolved',
-        WfTypeRef.named('String'),
+        WfTypeRef.named(name: 'String'),
       );
       n.isSignal.should.beTrue();
     });
@@ -536,7 +547,7 @@ void main() {
     test('Then escalation notification', () {
       final n = WfNotification.escalation(
         'SLAWarning',
-        WfTypeRef.named('SLAViolation'),
+        WfTypeRef.named(name: 'SLAViolation'),
       );
       n.isEscalation.should.beTrue();
     });
@@ -577,7 +588,7 @@ void main() {
 
   group('Given FlowCondition', () {
     test('Then ExpressionCondition toString', () {
-      const c = ExpressionCondition('checker.allProductsAvailable');
+      const c = ExpressionCondition(expression: 'checker.allProductsAvailable');
       (c.toString()).should.be('[checker.allProductsAvailable]');
     });
 
@@ -598,14 +609,16 @@ void main() {
     test('Then element target with condition', () {
       final t = FlowTarget.element(
         const NodeId('PrepareAndPackProducts'),
-        condition: const ExpressionCondition('checker.allProductsAvailable'),
+        condition: const ExpressionCondition(
+          expression: 'checker.allProductsAvailable',
+        ),
       );
       t.hasCondition.should.beTrue();
     });
 
     test('Then gateway target', () {
       final t = FlowTarget.gateway(
-        const WfInlineGateway(
+        gw: const WfInlineGateway(
           direction: GatewayDirection.split,
           kind: ExclusiveGateway(),
         ),
@@ -614,7 +627,7 @@ void main() {
     });
 
     test('Then block target', () {
-      final t = FlowTarget.block(const FlowBlock([]));
+      final t = FlowTarget.block(blk: const FlowBlock(branches: []));
       t.isBlock.should.beTrue();
     });
   });
@@ -639,7 +652,7 @@ void main() {
 
   group('Given TimerCondition', () {
     test('Then AtTimerCondition toString', () {
-      const c = AtTimerCondition(TimeOfDay(hours: 9, minutes: 0));
+      const c = AtTimerCondition(time: TimeOfDay(hours: 9, minutes: 0));
       (c.toString()).should.be('at 09:00');
     });
 
@@ -653,13 +666,13 @@ void main() {
     test('Then OnDateTimerCondition with time', () {
       const c = OnDateTimerCondition(
         date: CalendarDate(year: 2026, month: 6, day: 30),
-        atTime: AtTimerCondition(TimeOfDay(hours: 17, minutes: 0)),
+        atTime: AtTimerCondition(time: TimeOfDay(hours: 17, minutes: 0)),
       );
       (c.toString()).should.be('on 2026-06-30 at 17:00');
     });
 
     test('Then AfterPeriodCondition toString', () {
-      const c = AfterPeriodCondition('PT4H');
+      const c = AfterPeriodCondition(period: 'PT4H');
       (c.toString()).should.be('after PT4H');
     });
 
@@ -685,7 +698,7 @@ void main() {
 
   group('Given WfLane', () {
     test('Then lane holds elements', () {
-      final task = WfTask.generic('ProcessOrder');
+      final task = WfTask.generic(name: 'ProcessOrder');
       final lane = WfLane(id: const NodeId('Sales'), elements: [task]);
       lane.elements.should.haveCount(1);
       identical(lane.elements.first, task).should.beTrue();
@@ -696,7 +709,7 @@ void main() {
     test('Then process with lanes', () {
       final salesLane = WfLane(
         id: const NodeId('Sales'),
-        elements: [WfTask.generic('ProcessOrder')],
+        elements: [WfTask.generic(name: 'ProcessOrder')],
       );
       final p = WfProcess(
         id: const NodeId('OrderToDeliveryWorkflow'),
@@ -710,7 +723,7 @@ void main() {
     test('Then process without lanes', () {
       final p = WfProcess(
         id: const NodeId('SimpleProcess'),
-        elements: [WfTask.generic('DoWork')],
+        elements: [WfTask.generic(name: 'DoWork')],
       );
       p.hasLanes.should.beFalse();
     });
@@ -719,7 +732,7 @@ void main() {
   group('Given WorkflowCompilationUnit', () {
     test('Then fully qualified name with package', () {
       final cu = WorkflowCompilationUnit(
-        package: PackagePath.parse('de.monticore.bpmn.examples'),
+        package: PackagePath.parse(dotSeparated: 'de.monticore.bpmn.examples'),
         process: const WfProcess(id: NodeId('OrderToDeliveryWorkflow')),
       );
       cu.fullyQualifiedName.should.be(
@@ -839,7 +852,7 @@ void main() {
   group('Given CdClass', () {
     test('Then public data class', () {
       final c = CdClass.publicData(
-        'Order',
+        name: 'Order',
         attributes: [
           CdAttribute.public('orderID', 'String'),
           CdAttribute.public('numberOfOrderedProducts', 'int'),
@@ -888,9 +901,9 @@ void main() {
       const e = CdEnum(
         name: 'PaymentMethod',
         constants: [
-          CdEnumConstant('CREDIT_CARD'),
-          CdEnumConstant('DEBIT_CARD'),
-          CdEnumConstant('BANK_TRANSFER'),
+          CdEnumConstant(name: 'CREDIT_CARD'),
+          CdEnumConstant(name: 'DEBIT_CARD'),
+          CdEnumConstant(name: 'BANK_TRANSFER'),
         ],
       );
       e.constants.should.haveCount(3);
@@ -909,17 +922,17 @@ void main() {
     setUp(() {
       diagram = CdClassDiagram(
         name: 'OrderToDelivery',
-        package: PackagePath.parse('de.monticore.bpmn.cds'),
+        package: PackagePath.parse(dotSeparated: 'de.monticore.bpmn.cds'),
         classifiers: [
           CdClass.publicData(
-            'InventoryAvailabilityChecker',
+            name: 'InventoryAvailabilityChecker',
             attributes: [
               CdAttribute.public('allProductsAvailable', 'boolean'),
               CdAttribute.public('unavailableProducts', 'List<Product>'),
             ],
           ),
           CdClass.publicData(
-            'Order',
+            name: 'Order',
             attributes: [
               CdAttribute.public('orderID', 'String'),
               CdAttribute.public('customerID', 'String'),
@@ -930,7 +943,7 @@ void main() {
             ],
           ),
           CdClass.publicData(
-            'Product',
+            name: 'Product',
             attributes: [
               CdAttribute.public('productID', 'String'),
               CdAttribute.public('name', 'String'),
@@ -938,7 +951,7 @@ void main() {
             ],
           ),
           CdClass.publicData(
-            'CustomerDeliveryAgreement',
+            name: 'CustomerDeliveryAgreement',
             attributes: [
               CdAttribute.public('customerID', 'String'),
               CdAttribute.public('isOrderPickedUp', 'boolean'),
@@ -946,7 +959,7 @@ void main() {
             ],
           ),
           CdClass.publicData(
-            'DestinationAddress',
+            name: 'DestinationAddress',
             attributes: [
               CdAttribute.public('street', 'String'),
               CdAttribute.public('houseNumber', 'String'),
@@ -955,7 +968,7 @@ void main() {
             ],
           ),
           CdClass.publicData(
-            'PaymentValidityChecker',
+            name: 'PaymentValidityChecker',
             attributes: [
               CdAttribute.public('paymentValid', 'boolean'),
               CdAttribute.public('cardNumberValid', 'boolean'),
@@ -1005,7 +1018,7 @@ void main() {
     setUp(() {
       diagram = CdClassDiagram(
         name: 'Domain',
-        package: PackagePath.parse('de.monticore.bpmn.cds'),
+        package: PackagePath.parse(dotSeparated: 'de.monticore.bpmn.cds'),
         classifiers: [
           const CdClass(
             name: 'Contract',
@@ -1020,7 +1033,7 @@ void main() {
           ),
           const CdClass(name: 'DomainUser'),
           CdClass.publicData(
-            'Report',
+            name: 'Report',
             attributes: [
               CdAttribute.public('result', 'String'),
               CdAttribute.public('details', 'String'),
@@ -1045,7 +1058,7 @@ void main() {
             ],
           ),
           CdClass.publicData(
-            'MedicalCertificate',
+            name: 'MedicalCertificate',
             attributes: [
               const CdAttribute(
                 name: 'startDate',
@@ -1104,7 +1117,7 @@ void main() {
 
   group('Given WorkflowFailure', () {
     test('Then DeadNode message', () {
-      const f = DeadNode(NodeId('OrphanTask'));
+      const f = DeadNode(nodeId: NodeId('OrphanTask'));
       f.message.should.contain('OrphanTask');
       f.message.should.contain('unreachable');
     });
@@ -1119,7 +1132,7 @@ void main() {
     });
 
     test('Then LackOfSync message', () {
-      const f = LackOfSync(NodeId('MergeWork'));
+      const f = LackOfSync(mergeGatewayId: NodeId('MergeWork'));
       f.message.should.contain('MergeWork');
       f.message.should.contain('XOR');
     });
@@ -1134,7 +1147,7 @@ void main() {
     });
 
     test('Then TaskNotIncarnated message', () {
-      const f = TaskNotIncarnated(NodeId('LiteratureReview'));
+      const f = TaskNotIncarnated(taskId: NodeId('LiteratureReview'));
       f.message.should.contain('LiteratureReview');
       f.message.should.contain('reference model');
     });
@@ -1149,19 +1162,23 @@ void main() {
     });
 
     test('Then ProcessNotSound message', () {
-      const f = ProcessNotSound('path from start cannot reach end event');
+      const f = ProcessNotSound(
+        reason: 'path from start cannot reach end event',
+      );
       f.message.should.contain('not sound');
     });
 
     test('Then InfiniteLoop message', () {
-      const f = InfiniteLoop([NodeId('A'), NodeId('B'), NodeId('A')]);
+      const f = InfiniteLoop(
+        loopNodes: [NodeId('A'), NodeId('B'), NodeId('A')],
+      );
       f.message.should.contain('A → B → A');
     });
 
     test('Then failures are equatable', () {
-      const a = DeadNode(NodeId('X'));
-      const b = DeadNode(NodeId('X'));
-      const c = DeadNode(NodeId('Y'));
+      const a = DeadNode(nodeId: NodeId('X'));
+      const b = DeadNode(nodeId: NodeId('X'));
+      const c = DeadNode(nodeId: NodeId('Y'));
       a.should.be(b);
       a.should.not.be(c);
     });

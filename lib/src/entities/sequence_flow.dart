@@ -36,7 +36,7 @@ final class ExpressionCondition extends FlowCondition with EquatableMixin {
   final String expression;
 
   /// Creates an [ExpressionCondition] from the raw [expression].
-  const ExpressionCondition(this.expression);
+  const ExpressionCondition({required this.expression});
 
   @override
   List<Object?> get props => [expression];
@@ -97,12 +97,16 @@ class FlowTarget extends Equatable {
       FlowTarget._(elementRef: ref, condition: condition);
 
   /// Targets an inline gateway.
-  factory FlowTarget.gateway(WfInlineGateway gw, {FlowCondition? condition}) =>
-      FlowTarget._(inlineGateway: gw, condition: condition);
+  factory FlowTarget.gateway({
+    required WfInlineGateway gw,
+    FlowCondition? condition,
+  }) => FlowTarget._(inlineGateway: gw, condition: condition);
 
   /// Targets a [FlowBlock] (a set of branching sub-flows).
-  factory FlowTarget.block(FlowBlock blk, {FlowCondition? condition}) =>
-      FlowTarget._(block: blk, condition: condition);
+  factory FlowTarget.block({
+    required FlowBlock blk,
+    FlowCondition? condition,
+  }) => FlowTarget._(block: blk, condition: condition);
 
   /// Whether this step is guarded by a condition.
   bool get hasCondition => condition != null;
@@ -147,7 +151,7 @@ class FlowBlock extends Equatable {
   final List<SequenceFlow> branches;
 
   /// Creates a [FlowBlock] wrapping the given [branches].
-  const FlowBlock(this.branches);
+  const FlowBlock({required this.branches});
 
   @override
   List<Object?> get props => [branches];

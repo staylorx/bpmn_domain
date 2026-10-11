@@ -106,14 +106,14 @@ class WfDataObject extends Equatable implements FlowElement {
   factory WfDataObject.data(String name, String typeName) => WfDataObject(
     id: NodeId(name),
     kind: DataKind.dataObject,
-    type: WfTypeRef.named(typeName),
+    type: WfTypeRef.named(name: typeName),
   );
 
   /// Creates a data store declaration.
   factory WfDataObject.store(String name, String typeName) => WfDataObject(
     id: NodeId(name),
     kind: DataKind.dataStore,
-    type: WfTypeRef.named(typeName),
+    type: WfTypeRef.named(name: typeName),
   );
 
   /// `true` when this is a transient data object.

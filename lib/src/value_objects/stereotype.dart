@@ -34,7 +34,7 @@ class Stereotype extends Equatable {
   const Stereotype({required this.key, this.value});
 
   /// Convenience constructor for the `incarnates` conformance stereotype.
-  factory Stereotype.incarnates(String referenceName) =>
+  factory Stereotype.incarnates({required String referenceName}) =>
       Stereotype(key: 'incarnates', value: referenceName);
 
   @override

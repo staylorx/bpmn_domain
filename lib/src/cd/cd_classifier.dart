@@ -123,8 +123,8 @@ class CdClass extends Equatable implements CdClassifier {
   // Convenience constructors -----------------------------------------------
 
   /// Creates a simple public concrete class with only attributes.
-  factory CdClass.publicData(
-    String name, {
+  factory CdClass.publicData({
+    required String name,
     List<CdAttribute> attributes = const [],
   }) => CdClass(
     name: name,
@@ -208,7 +208,7 @@ class CdEnumConstant extends Equatable {
   final String name;
 
   /// Creates a [CdEnumConstant] named [name].
-  const CdEnumConstant(this.name);
+  const CdEnumConstant({required this.name});
 
   @override
   List<Object?> get props => [name];

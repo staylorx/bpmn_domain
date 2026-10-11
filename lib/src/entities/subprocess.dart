@@ -192,18 +192,18 @@ class WfSubProcess extends Equatable implements FlowElement {
   // Convenience constructors ---------------------------------------------------
 
   /// Creates an empty embedded subprocess.
-  factory WfSubProcess.embedded(String name) =>
+  factory WfSubProcess.embedded({required String name}) =>
       WfSubProcess(id: NodeId(name), subProcessType: SubProcessType.embedded);
 
   /// Creates a transaction subprocess.
-  factory WfSubProcess.transaction(String name) => WfSubProcess(
+  factory WfSubProcess.transaction({required String name}) => WfSubProcess(
     id: NodeId(name),
     subProcessType: SubProcessType.transaction,
   );
 
   /// Creates an ad-hoc subprocess.
-  factory WfSubProcess.adhoc(
-    String name, {
+  factory WfSubProcess.adhoc({
+    required String name,
     required String completionCondition,
     bool parallel = false,
   }) => WfSubProcess(

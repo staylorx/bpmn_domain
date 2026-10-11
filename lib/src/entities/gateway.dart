@@ -245,49 +245,49 @@ class WfGateway extends Equatable implements FlowElement {
   // Convenience constructors ---------------------------------------------------
 
   /// Creates an exclusive-XOR split gateway.
-  factory WfGateway.splitXor(String name) => WfGateway(
+  factory WfGateway.splitXor({required String name}) => WfGateway(
     id: NodeId(name),
     direction: GatewayDirection.split,
     kind: const ExclusiveGateway(),
   );
 
   /// Creates an exclusive-XOR merge gateway.
-  factory WfGateway.mergeXor(String name) => WfGateway(
+  factory WfGateway.mergeXor({required String name}) => WfGateway(
     id: NodeId(name),
     direction: GatewayDirection.merge,
     kind: const ExclusiveGateway(),
   );
 
   /// Creates a parallel-AND split gateway.
-  factory WfGateway.splitAnd(String name) => WfGateway(
+  factory WfGateway.splitAnd({required String name}) => WfGateway(
     id: NodeId(name),
     direction: GatewayDirection.split,
     kind: const ParallelGateway(),
   );
 
   /// Creates a parallel-AND merge gateway.
-  factory WfGateway.mergeAnd(String name) => WfGateway(
+  factory WfGateway.mergeAnd({required String name}) => WfGateway(
     id: NodeId(name),
     direction: GatewayDirection.merge,
     kind: const ParallelGateway(),
   );
 
   /// Creates an inclusive-IOR split gateway.
-  factory WfGateway.splitIor(String name) => WfGateway(
+  factory WfGateway.splitIor({required String name}) => WfGateway(
     id: NodeId(name),
     direction: GatewayDirection.split,
     kind: const InclusiveGateway(),
   );
 
   /// Creates a parallel event-based split gateway.
-  factory WfGateway.splitReceiveAll(String name) => WfGateway(
+  factory WfGateway.splitReceiveAll({required String name}) => WfGateway(
     id: NodeId(name),
     direction: GatewayDirection.split,
     kind: const ParallelEventGateway(),
   );
 
   /// Creates an exclusive event-based split gateway.
-  factory WfGateway.splitReceiveFirst(String name) => WfGateway(
+  factory WfGateway.splitReceiveFirst({required String name}) => WfGateway(
     id: NodeId(name),
     direction: GatewayDirection.split,
     kind: const ExclusiveEventGateway(),

@@ -40,7 +40,7 @@ final class AdHocSubProcessEmpty extends WorkflowFailure {
   final NodeId subProcessId;
 
   /// Creates an [AdHocSubProcessEmpty] failure for [subProcessId].
-  const AdHocSubProcessEmpty(this.subProcessId);
+  const AdHocSubProcessEmpty({required this.subProcessId});
 
   @override
   String get message =>
@@ -58,7 +58,7 @@ final class AdHocSubProcessHasStartOrEndEvent extends WorkflowFailure {
   final NodeId subProcessId;
 
   /// Creates an [AdHocSubProcessHasStartOrEndEvent] failure for [subProcessId].
-  const AdHocSubProcessHasStartOrEndEvent(this.subProcessId);
+  const AdHocSubProcessHasStartOrEndEvent({required this.subProcessId});
 
   @override
   String get message =>
@@ -101,7 +101,7 @@ final class CompensationActivityHasFlow extends WorkflowFailure {
   final NodeId activityId;
 
   /// Creates a [CompensationActivityHasFlow] failure for [activityId].
-  const CompensationActivityHasFlow(this.activityId);
+  const CompensationActivityHasFlow({required this.activityId});
 
   @override
   String get message =>
@@ -120,7 +120,7 @@ final class EventSubProcessHasFlow extends WorkflowFailure {
   final NodeId subProcessId;
 
   /// Creates an [EventSubProcessHasFlow] failure for [subProcessId].
-  const EventSubProcessHasFlow(this.subProcessId);
+  const EventSubProcessHasFlow({required this.subProcessId});
 
   @override
   String get message =>
@@ -193,7 +193,7 @@ final class DeadNode extends WorkflowFailure {
   final NodeId nodeId;
 
   /// Creates a [DeadNode] failure for [nodeId].
-  const DeadNode(this.nodeId);
+  const DeadNode({required this.nodeId});
 
   @override
   String get message =>
@@ -213,7 +213,7 @@ final class DisconnectedComponent extends WorkflowFailure {
   final List<NodeId> componentNodes;
 
   /// Creates a [DisconnectedComponent] failure for [componentNodes].
-  const DisconnectedComponent(this.componentNodes);
+  const DisconnectedComponent({required this.componentNodes});
 
   @override
   String get message =>
@@ -232,7 +232,7 @@ final class InfiniteLoop extends WorkflowFailure {
   final List<NodeId> loopNodes;
 
   /// Creates an [InfiniteLoop] failure for [loopNodes].
-  const InfiniteLoop(this.loopNodes);
+  const InfiniteLoop({required this.loopNodes});
 
   @override
   String get message =>
@@ -252,7 +252,7 @@ final class LackOfSync extends WorkflowFailure {
   final NodeId mergeGatewayId;
 
   /// Creates a [LackOfSync] failure for [mergeGatewayId].
-  const LackOfSync(this.mergeGatewayId);
+  const LackOfSync({required this.mergeGatewayId});
 
   @override
   String get message =>
@@ -272,7 +272,7 @@ final class SyncDeadlock extends WorkflowFailure {
   final NodeId mergeGatewayId;
 
   /// Creates a [SyncDeadlock] failure for [mergeGatewayId].
-  const SyncDeadlock(this.mergeGatewayId);
+  const SyncDeadlock({required this.mergeGatewayId});
 
   @override
   String get message =>
@@ -292,7 +292,7 @@ final class ProcessNotSound extends WorkflowFailure {
   final String reason;
 
   /// Creates a [ProcessNotSound] failure with [reason].
-  const ProcessNotSound(this.reason);
+  const ProcessNotSound({required this.reason});
 
   @override
   String get message => 'The process is not sound: $reason';
@@ -313,7 +313,7 @@ final class StartEventIsThrowing extends WorkflowFailure {
   final NodeId eventId;
 
   /// Creates a [StartEventIsThrowing] failure for [eventId].
-  const StartEventIsThrowing(this.eventId);
+  const StartEventIsThrowing({required this.eventId});
 
   @override
   String get message =>
@@ -331,7 +331,7 @@ final class EndEventIsCatching extends WorkflowFailure {
   final NodeId eventId;
 
   /// Creates an [EndEventIsCatching] failure for [eventId].
-  const EndEventIsCatching(this.eventId);
+  const EndEventIsCatching({required this.eventId});
 
   @override
   String get message =>
@@ -363,7 +363,7 @@ final class BoundaryEventHasIncomingFlow extends WorkflowFailure {
   final NodeId eventId;
 
   /// Creates a [BoundaryEventHasIncomingFlow] failure for [eventId].
-  const BoundaryEventHasIncomingFlow(this.eventId);
+  const BoundaryEventHasIncomingFlow({required this.eventId});
 
   @override
   String get message =>
@@ -385,7 +385,7 @@ final class MultipleDefaultBranches extends WorkflowFailure {
   final NodeId splitGatewayId;
 
   /// Creates a [MultipleDefaultBranches] failure for [splitGatewayId].
-  const MultipleDefaultBranches(this.splitGatewayId);
+  const MultipleDefaultBranches({required this.splitGatewayId});
 
   @override
   String get message =>
@@ -404,7 +404,7 @@ final class DefaultBranchNotLast extends WorkflowFailure {
   final NodeId gatewayId;
 
   /// Creates a [DefaultBranchNotLast] failure for [gatewayId].
-  const DefaultBranchNotLast(this.gatewayId);
+  const DefaultBranchNotLast({required this.gatewayId});
 
   @override
   String get message =>
@@ -423,7 +423,7 @@ final class EndEventHasOutgoingFlow extends WorkflowFailure {
   final NodeId eventId;
 
   /// Creates an [EndEventHasOutgoingFlow] failure for [eventId].
-  const EndEventHasOutgoingFlow(this.eventId);
+  const EndEventHasOutgoingFlow({required this.eventId});
 
   @override
   String get message =>
@@ -520,7 +520,7 @@ final class EventGatewayMixedTargetTypes extends WorkflowFailure {
   final NodeId gatewayId;
 
   /// Creates an [EventGatewayMixedTargetTypes] failure for [gatewayId].
-  const EventGatewayMixedTargetTypes(this.gatewayId);
+  const EventGatewayMixedTargetTypes({required this.gatewayId});
 
   @override
   String get message =>
@@ -539,7 +539,7 @@ final class EventGatewayIsNotSplit extends WorkflowFailure {
   final NodeId gatewayId;
 
   /// Creates an [EventGatewayIsNotSplit] failure for [gatewayId].
-  const EventGatewayIsNotSplit(this.gatewayId);
+  const EventGatewayIsNotSplit({required this.gatewayId});
 
   @override
   String get message =>
@@ -562,7 +562,7 @@ final class TaskNotIncarnated extends WorkflowFailure {
   final NodeId taskId;
 
   /// Creates a [TaskNotIncarnated] failure for [taskId].
-  const TaskNotIncarnated(this.taskId);
+  const TaskNotIncarnated({required this.taskId});
 
   @override
   String get message =>

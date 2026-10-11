@@ -117,7 +117,7 @@ class TaskTypeAttributes extends Equatable {
   );
 
   /// Creates attributes for a manual task with resources.
-  factory TaskTypeAttributes.manual(List<String> resources) =>
+  factory TaskTypeAttributes.manual({required List<String> resources}) =>
       TaskTypeAttributes(resources: resources);
 
   /// Creates attributes for a script task.
@@ -236,7 +236,7 @@ class WfTask extends Equatable implements FlowElement {
   // Convenience constructors ---------------------------------------------------
 
   /// Creates a generic (untyped) task.
-  factory WfTask.generic(String name) =>
+  factory WfTask.generic({required String name}) =>
       WfTask(id: NodeId(name), type: TaskType.generic);
 
   /// Creates a service task with a web-service binding.
@@ -275,7 +275,7 @@ class WfTask extends Equatable implements FlowElement {
   factory WfTask.manual(String name, List<String> resources) => WfTask(
     id: NodeId(name),
     type: TaskType.manual,
-    taskTypeAttributes: TaskTypeAttributes.manual(resources),
+    taskTypeAttributes: TaskTypeAttributes.manual(resources: resources),
   );
 
   /// Creates a receive task.
