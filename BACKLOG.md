@@ -123,10 +123,15 @@ do not auto-fix. Line references are to `main` @ `c44dbff`.
   error style, loudly") requires the barrel doc comment, the README and (on
   deviation) `AGENTS.md` to state it; `lib/bpmn_domain.dart`'s doc comment
   documents the API surface but never names an error style, the README's
-  "Dependencies" section does not either, and there is no `AGENTS.md`. Note the
+  does not either, and there was no `AGENTS.md`. Note the
   repo also carries no `Either`-returning operation at all, so today the package
   *is* silent-compliant — but silence is the violation, and consumers need to know
   what the parser/validator layer above will hand them.
+  **STATUS: RESOLVED — declared in `AGENTS.md`'s Error Style Declaration**
+  (`a7c584d`): *"This package deviates from the default `Future<Either<…>>` error
+  style. It returns immutable data plus a `sealed` failure tree; no `Either` is
+  used."* The barrel doc comment and README remain the non-declared surfaces, but
+  the doctrine's declaration duty (AGENTS.md on deviation) is satisfied.
 
 - Deviation: `pubspec.yaml:15` + all of `lib/` - **`fpdart` is a declared
   dependency that nothing uses.** §4/§5 make `Either`/`TaskEither` the failure
