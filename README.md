@@ -444,6 +444,8 @@ dart test
 | `fpdart`      | `^1.2.0`    | `Either`/`Option` for the validator/parser layers |
 | `petitparser` | _(pending)_ | Combinator-based parser (next layer)              |
 
+For the full dependency-drift analysis for this release (each outdated package, the chosen action, and rationale), see **[DEPENDENCY_DECISIONS.md](DEPENDENCY_DECISIONS.md)** (source report: `pub_outdated_report.txt` / `pub_outdated_report.full.txt`). In short: 21 of 22 stale packages resolve at their latest under current constraints (plain `dart pub upgrade`); `equatable` stays on `^2.0.7` because 3.0.0 is breaking (removes `EquatableMixin`, used in 61 places).
+
 ---
 
 ## Roadmap

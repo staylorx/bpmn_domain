@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Dependency-drift decisions — see `DEPENDENCY_DECISIONS.md` (committed with the captured `dart pub outdated` report). 21 of 22 stale packages already resolve at their latest under current constraints and need only a plain `dart pub upgrade`; `equatable` stays on `^2.0.7` because 3.0.0 is breaking (removes `EquatableMixin`, used in 61 places). See README → [Dependencies](#dependencies).
 - `.github/workflows/ci.yml` — CI runs on every push to `main` and on each PR,
   pinned to the Dart 3.13.1 SDK (matching the raised `environment.sdk` floor and
   the resolved lockfile). Gate: `dart pub get` → `dart analyze
