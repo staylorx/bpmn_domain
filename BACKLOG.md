@@ -188,6 +188,31 @@ do not auto-fix. Line references are to `main` @ `c44dbff`.
   so this is flagged as a deliberate topology choice the bible does not describe
   — noted because the git-dependency wiring (unpinned `ref:` in the siblings) is
   the failure mode the workspace model exists to prevent.
+  **STATUS: SANCTIONED — KEEP STANDALONE (decision t_75b4af8e).** Decision
+  (2026-10-11): keep `bpmn_domain` as a standalone single package rather than
+  restructuring toward Topology A or B (bible §2/§3). Rationale: (1) this
+  package is a **pure-domain centre** — no repository contracts, no datasource
+  adapters, no use cases, no I/O — so the bible's ≥2-repository-adapter rule and
+  shared contract suite are **vacuous** here (nothing to bind to); (2) Topology
+  A/B skeletons assume a *full deliverable* (domain + use cases + ≥2 datasource
+  adapters + app), which already exists across the sibling repos
+  (`bpmn_application` holds the 7 use cases + 2 repository contracts,
+  `bpmn_infrastructure` is already a melos workspace with 3 adapter packages over
+  2 datasources) — so this package is one well-formed per-repo split within an
+  already-composed system, not an incomplete monolith (see the `dart_arch_test`
+  deviation above: the boundary test is the workspace-level catch, and it is
+  flagged there, not here); (3) adding a `workspace:` / melos block to a
+  single, already-consumed core package would add tooling without adding
+  topology value. Residually, the known costs stand recorded: siblings consume
+  this repo by unpinned `ref: main` git dependency, the failure mode the
+  workspace model exists to prevent — tracked as the separate workspace-level
+  wiring concern at `t_8ccdd421`. **REVISIT TRIGGER: when the use-case /
+  application layer lands in or is added to this package (i.e. the first
+  `I*Repository` contract or use case is declared here, or a second package is
+  introduced into this repo), re-evaluate workspace adoption then.** See the
+  related application-layer card **t_eda54b2f ("Decide use-case layer
+  sequencing")** — currently sequencing the use-case/validator seam into
+  `bpmn_application`, which is where this deviation gets revisited.
 
 ## Open questions
 
