@@ -68,7 +68,7 @@ enum TaskType {
 /// - Script → [scriptFormat] and [script]
 ///
 /// Exactly one of the attribute groups is populated for a given task type.
-class TaskTypeAttributes with EquatableMixin {
+class TaskTypeAttributes extends Equatable {
   /// Web-service binding.  May be a URI string, `##unspecified`, or
   /// `##webservice` (using the abstract BPMN web-service placeholder).
   final String? webservice;
@@ -88,6 +88,8 @@ class TaskTypeAttributes with EquatableMixin {
   /// The inline script body.
   final String? script;
 
+  /// Creates a [TaskTypeAttributes] with the given optional [webservice],
+  /// [operation], [message], [resources], [scriptFormat] and [script].
   const TaskTypeAttributes({
     this.webservice,
     this.operation,
@@ -101,20 +103,18 @@ class TaskTypeAttributes with EquatableMixin {
   factory TaskTypeAttributes.webService({
     required String webservice,
     NodeId? operation,
-  }) =>
-      TaskTypeAttributes(webservice: webservice, operation: operation);
+  }) => TaskTypeAttributes(webservice: webservice, operation: operation);
 
   /// Creates attributes for a send or receive task.
   factory TaskTypeAttributes.messaging({
     required String webservice,
     required NodeId message,
     NodeId? operation,
-  }) =>
-      TaskTypeAttributes(
-        webservice: webservice,
-        message: message,
-        operation: operation,
-      );
+  }) => TaskTypeAttributes(
+    webservice: webservice,
+    message: message,
+    operation: operation,
+  );
 
   /// Creates attributes for a manual task with resources.
   factory TaskTypeAttributes.manual(List<String> resources) =>
@@ -124,12 +124,17 @@ class TaskTypeAttributes with EquatableMixin {
   factory TaskTypeAttributes.script({
     required String format,
     required String body,
-  }) =>
-      TaskTypeAttributes(scriptFormat: format, script: body);
+  }) => TaskTypeAttributes(scriptFormat: format, script: body);
 
   @override
-  List<Object?> get props =>
-      [webservice, operation, message, resources, scriptFormat, script];
+  List<Object?> get props => [
+    webservice,
+    operation,
+    message,
+    resources,
+    scriptFormat,
+    script,
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -192,7 +197,7 @@ class TaskTypeAttributes with EquatableMixin {
 /// ```
 /// <<incarnates="Research">> task LiteratureReview;
 /// ```
-class WfTask with EquatableMixin implements FlowElement {
+class WfTask extends Equatable implements FlowElement {
   /// The unique name of this task within its enclosing scope.
   @override
   final NodeId id;
@@ -215,6 +220,9 @@ class WfTask with EquatableMixin implements FlowElement {
   /// Access modifier and stereotype annotations.
   final WfModifier modifier;
 
+  /// Creates a [WfTask] with the given [id] and optional [type],
+  /// [taskTypeAttributes], [loop], [ioRequirements], [boundaryEvents] and
+  /// [modifier].
   const WfTask({
     required this.id,
     this.type = TaskType.generic,
@@ -237,16 +245,15 @@ class WfTask with EquatableMixin implements FlowElement {
     required String webservice,
     String? operationName,
     LoopCharacteristic? loop,
-  }) =>
-      WfTask(
-        id: NodeId(name),
-        type: TaskType.service,
-        taskTypeAttributes: TaskTypeAttributes.webService(
-          webservice: webservice,
-          operation: operationName != null ? NodeId(operationName) : null,
-        ),
-        loop: loop,
-      );
+  }) => WfTask(
+    id: NodeId(name),
+    type: TaskType.service,
+    taskTypeAttributes: TaskTypeAttributes.webService(
+      webservice: webservice,
+      operation: operationName != null ? NodeId(operationName) : null,
+    ),
+    loop: loop,
+  );
 
   /// Creates a send task.
   factory WfTask.send({
@@ -254,51 +261,47 @@ class WfTask with EquatableMixin implements FlowElement {
     required String webservice,
     required String messageName,
     String? operationName,
-  }) =>
-      WfTask(
-        id: NodeId(name),
-        type: TaskType.send,
-        taskTypeAttributes: TaskTypeAttributes.messaging(
-          webservice: webservice,
-          message: NodeId(messageName),
-          operation: operationName != null ? NodeId(operationName) : null,
-        ),
-      );
+  }) => WfTask(
+    id: NodeId(name),
+    type: TaskType.send,
+    taskTypeAttributes: TaskTypeAttributes.messaging(
+      webservice: webservice,
+      message: NodeId(messageName),
+      operation: operationName != null ? NodeId(operationName) : null,
+    ),
+  );
 
   /// Creates a manual task with explicit resource names.
   factory WfTask.manual(String name, List<String> resources) => WfTask(
-        id: NodeId(name),
-        type: TaskType.manual,
-        taskTypeAttributes: TaskTypeAttributes.manual(resources),
-      );
+    id: NodeId(name),
+    type: TaskType.manual,
+    taskTypeAttributes: TaskTypeAttributes.manual(resources),
+  );
 
   /// Creates a receive task.
   factory WfTask.receive({
     required String name,
     required String webservice,
     required String messageName,
-  }) =>
-      WfTask(
-        id: NodeId(name),
-        type: TaskType.receive,
-        taskTypeAttributes: TaskTypeAttributes.messaging(
-          webservice: webservice,
-          message: NodeId(messageName),
-        ),
-      );
+  }) => WfTask(
+    id: NodeId(name),
+    type: TaskType.receive,
+    taskTypeAttributes: TaskTypeAttributes.messaging(
+      webservice: webservice,
+      message: NodeId(messageName),
+    ),
+  );
 
   /// Creates a script task.
   factory WfTask.script({
     required String name,
     required String format,
     required String body,
-  }) =>
-      WfTask(
-        id: NodeId(name),
-        type: TaskType.script,
-        taskTypeAttributes:
-            TaskTypeAttributes.script(format: format, body: body),
-      );
+  }) => WfTask(
+    id: NodeId(name),
+    type: TaskType.script,
+    taskTypeAttributes: TaskTypeAttributes.script(format: format, body: body),
+  );
 
   // Derived properties ---------------------------------------------------
 
@@ -313,12 +316,12 @@ class WfTask with EquatableMixin implements FlowElement {
 
   @override
   List<Object?> get props => [
-        id,
-        type,
-        taskTypeAttributes,
-        loop,
-        ioRequirements,
-        boundaryEvents,
-        modifier,
-      ];
+    id,
+    type,
+    taskTypeAttributes,
+    loop,
+    ioRequirements,
+    boundaryEvents,
+    modifier,
+  ];
 }

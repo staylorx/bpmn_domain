@@ -62,7 +62,7 @@ import 'cd_classifier.dart';
 ///
 /// These are assembled from parsed `.cd` source using the domain layer.
 /// The parser (future data layer) converts raw source text into this entity.
-class CdClassDiagram with EquatableMixin {
+class CdClassDiagram extends Equatable {
   /// The diagram name, e.g. `OrderToDelivery`, `Domain`.
   final String name;
 
@@ -75,6 +75,8 @@ class CdClassDiagram with EquatableMixin {
   /// All associations between classifiers.
   final List<CdAssociation> associations;
 
+  /// Creates a [CdClassDiagram] with the given [name] and [classifiers],
+  /// plus optional [package] and [associations].
   const CdClassDiagram({
     required this.name,
     required this.classifiers,
@@ -115,10 +117,15 @@ class CdClassDiagram with EquatableMixin {
 ///
 /// Mirrors the structure of [WorkflowCompilationUnit] for the class diagram
 /// language.  A `.cd` file contains exactly one [CdClassDiagram].
-class CdCompilationUnit with EquatableMixin {
+class CdCompilationUnit extends Equatable {
+  /// The package the `.cd` file declares.
   final PackagePath package;
+
+  /// The single class diagram contained in the compilation unit.
   final CdClassDiagram diagram;
 
+  /// Creates a [CdCompilationUnit] wrapping [diagram], optionally under
+  /// [package].
   const CdCompilationUnit({
     required this.diagram,
     this.package = PackagePath.root,

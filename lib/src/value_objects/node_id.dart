@@ -15,10 +15,11 @@ import 'package:equatable/equatable.dart';
 /// final same = NodeId('ProcessOrder');
 /// assert(id == same); // structural equality via Equatable
 /// ```
-class NodeId with EquatableMixin {
+class NodeId extends Equatable {
   /// The raw name string exactly as it appears in the `.wfm` source.
   final String value;
 
+  /// Creates a [NodeId] wrapping [value]; the identifier must be non-empty.
   const NodeId(this.value) : assert(value != '');
 
   /// Whether this identifier follows the simple (unqualified) name rule:
@@ -37,10 +38,11 @@ class NodeId with EquatableMixin {
 /// path.
 ///
 /// Example: `de.monticore.bpmn.examples.OrderToDeliveryWorkflow.ProcessOrder`
-class QualifiedNodeId with EquatableMixin {
+class QualifiedNodeId extends Equatable {
   /// All path segments, including the final simple name.
   final List<String> segments;
 
+  /// Creates a [QualifiedNodeId] from its path [segments]; must be non-empty.
   const QualifiedNodeId(this.segments) : assert(segments.length > 0);
 
   /// Creates a [QualifiedNodeId] from a dot-separated string.

@@ -23,7 +23,7 @@ import 'package:equatable/equatable.dart';
 ///   wildcard: true,
 /// );
 /// ```
-class ImportStatement with EquatableMixin {
+class ImportStatement extends Equatable {
   /// The dot-separated path up to (but not including) the trailing `.*` or
   /// the final simple name, depending on [wildcard].
   final String path;
@@ -31,6 +31,8 @@ class ImportStatement with EquatableMixin {
   /// `true` when the import is a wildcard (`.*`) import.
   final bool wildcard;
 
+  /// Creates an [ImportStatement] for the given [path], optionally as a
+  /// wildcard (`.*`) import.
   const ImportStatement({required this.path, this.wildcard = false});
 
   @override

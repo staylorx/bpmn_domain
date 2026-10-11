@@ -12,10 +12,11 @@ import 'package:equatable/equatable.dart';
 /// // pkg.segments == ['de', 'monticore', 'bpmn', 'examples']
 /// // pkg.toString() == 'de.monticore.bpmn.examples'
 /// ```
-class PackagePath with EquatableMixin {
+class PackagePath extends Equatable {
   /// The individual path components, e.g. `['de', 'monticore', 'bpmn']`.
   final List<String> segments;
 
+  /// Creates a [PackagePath] from its dot-separated [segments].
   const PackagePath(this.segments);
 
   /// The top-level (root) package with no path segments.

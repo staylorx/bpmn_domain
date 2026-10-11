@@ -22,7 +22,7 @@ import 'package:equatable/equatable.dart';
 /// final s = Stereotype(key: 'incarnates', value: 'Research');
 /// print(s); // <<incarnates="Research">>
 /// ```
-class Stereotype with EquatableMixin {
+class Stereotype extends Equatable {
   /// The stereotype key (e.g. `incarnates`).
   final String key;
 
@@ -30,6 +30,7 @@ class Stereotype with EquatableMixin {
   /// stereotype is a marker without a value.
   final String? value;
 
+  /// Creates a [Stereotype] with the given [key] and optional [value].
   const Stereotype({required this.key, this.value});
 
   /// Convenience constructor for the `incarnates` conformance stereotype.
@@ -75,10 +76,14 @@ enum WfVisibility {
 ///   stereotypes: [Stereotype.incarnates('Research')],
 /// );
 /// ```
-class WfModifier with EquatableMixin {
+class WfModifier extends Equatable {
+  /// The element's visibility, defaulting to [WfVisibility.unspecified].
   final WfVisibility visibility;
+
+  /// The stereotype tags attached to the element.
   final List<Stereotype> stereotypes;
 
+  /// Creates a [WfModifier] with the given [visibility] and [stereotypes].
   const WfModifier({
     this.visibility = WfVisibility.unspecified,
     this.stereotypes = const [],

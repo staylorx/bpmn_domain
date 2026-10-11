@@ -26,3 +26,4 @@ linter:
     - close_sinks
     - avoid_print
     - prefer_const_constructors
+    - public_member_api_docs

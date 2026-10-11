@@ -13,9 +13,16 @@ import 'cd_visibility.dart';
 /// Classifiers have a [name] unique within the [CdClassDiagram] and may
 /// carry [attributes] and [methods].
 abstract interface class CdClassifier {
+  /// The classifier's simple name.
   String get name;
+
+  /// The attributes declared on this classifier.
   List<CdAttribute> get attributes;
+
+  /// The methods declared on this classifier.
   List<CdMethod> get methods;
+
+  /// The classifier's visibility.
   CdVisibility get visibility;
 }
 
@@ -78,7 +85,7 @@ abstract interface class CdClassifier {
 /// ```cd
 /// public class SpecialOrder extends Order implements Trackable { ... }
 /// ```
-class CdClass with EquatableMixin implements CdClassifier {
+class CdClass extends Equatable implements CdClassifier {
   @override
   final String name;
 
@@ -100,6 +107,9 @@ class CdClass with EquatableMixin implements CdClassifier {
   /// Names of interfaces this class implements.
   final List<String> interfaces;
 
+  /// Creates a [CdClass] with the given [name], optional [visibility],
+  /// [attributes], [methods], [isAbstract] flag, [superClass] and
+  /// [interfaces].
   const CdClass({
     required this.name,
     this.visibility = CdVisibility.packageLocal,
@@ -116,23 +126,22 @@ class CdClass with EquatableMixin implements CdClassifier {
   factory CdClass.publicData(
     String name, {
     List<CdAttribute> attributes = const [],
-  }) =>
-      CdClass(
-        name: name,
-        visibility: CdVisibility.public,
-        attributes: attributes,
-      );
+  }) => CdClass(
+    name: name,
+    visibility: CdVisibility.public,
+    attributes: attributes,
+  );
 
   @override
   List<Object?> get props => [
-        name,
-        visibility,
-        attributes,
-        methods,
-        isAbstract,
-        superClass,
-        interfaces
-      ];
+    name,
+    visibility,
+    attributes,
+    methods,
+    isAbstract,
+    superClass,
+    interfaces,
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -153,7 +162,7 @@ class CdClass with EquatableMixin implements CdClassifier {
 /// ```
 ///
 /// Classes can list interfaces in their `implements` clause.
-class CdInterface with EquatableMixin implements CdClassifier {
+class CdInterface extends Equatable implements CdClassifier {
   @override
   final String name;
 
@@ -169,6 +178,8 @@ class CdInterface with EquatableMixin implements CdClassifier {
   /// Names of super-interfaces this interface extends.
   final List<String> superInterfaces;
 
+  /// Creates a [CdInterface] with the given [name], optional [visibility],
+  /// [attributes], [methods] and [superInterfaces].
   const CdInterface({
     required this.name,
     this.visibility = CdVisibility.packageLocal,
@@ -178,8 +189,13 @@ class CdInterface with EquatableMixin implements CdClassifier {
   });
 
   @override
-  List<Object?> get props =>
-      [name, visibility, attributes, methods, superInterfaces];
+  List<Object?> get props => [
+    name,
+    visibility,
+    attributes,
+    methods,
+    superInterfaces,
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -187,9 +203,11 @@ class CdInterface with EquatableMixin implements CdClassifier {
 // ---------------------------------------------------------------------------
 
 /// A single constant in a [CdEnum].
-class CdEnumConstant with EquatableMixin {
+class CdEnumConstant extends Equatable {
+  /// The constant's name.
   final String name;
 
+  /// Creates a [CdEnumConstant] named [name].
   const CdEnumConstant(this.name);
 
   @override
@@ -221,13 +239,14 @@ class CdEnumConstant with EquatableMixin {
 /// ```
 /// data paymentDetails:PaymentMethod;
 /// ```
-class CdEnum with EquatableMixin implements CdClassifier {
+class CdEnum extends Equatable implements CdClassifier {
   @override
   final String name;
 
   @override
   final CdVisibility visibility;
 
+  /// The constants declared by this enum.
   final List<CdEnumConstant> constants;
 
   @override
@@ -236,6 +255,8 @@ class CdEnum with EquatableMixin implements CdClassifier {
   @override
   final List<CdMethod> methods;
 
+  /// Creates a [CdEnum] with the given [name] and [constants], plus optional
+  /// [visibility], [attributes] and [methods].
   const CdEnum({
     required this.name,
     required this.constants,

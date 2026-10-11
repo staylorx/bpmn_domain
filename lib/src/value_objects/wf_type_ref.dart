@@ -21,10 +21,11 @@ import 'package:equatable/equatable.dart';
 /// final t = WfTypeRef.named('Order');
 /// final t2 = WfTypeRef.named('List<Product>');
 /// ```
-class WfTypeRef with EquatableMixin {
+class WfTypeRef extends Equatable {
   /// The raw type expression as it appears in the source.
   final String expression;
 
+  /// Creates a [WfTypeRef] wrapping [expression]; must be non-empty.
   const WfTypeRef(this.expression) : assert(expression != '');
 
   /// Creates a [WfTypeRef] for a plain named type.

@@ -35,6 +35,7 @@ final class ExpressionCondition extends FlowCondition with EquatableMixin {
   /// The raw boolean expression from the source, e.g. `checker.allProductsAvailable`.
   final String expression;
 
+  /// Creates an [ExpressionCondition] from the raw [expression].
   const ExpressionCondition(this.expression);
 
   @override
@@ -47,6 +48,7 @@ final class ExpressionCondition extends FlowCondition with EquatableMixin {
 /// The default branch — taken when no [ExpressionCondition] on a sibling
 /// branch evaluates to `true`.  Written as `[_]` in the DSL.
 final class DefaultCondition extends FlowCondition with EquatableMixin {
+  /// Creates the default (`[_]`) branch condition.
   const DefaultCondition();
 
   @override
@@ -70,7 +72,7 @@ final class DefaultCondition extends FlowCondition with EquatableMixin {
 /// A [condition] may guard the step.
 ///
 /// Exactly one of [elementRef], [inlineGateway], or [block] is non-null.
-class FlowTarget with EquatableMixin {
+class FlowTarget extends Equatable {
   /// Guard condition on this step. `null` = unconditional.
   final FlowCondition? condition;
 
@@ -91,24 +93,15 @@ class FlowTarget with EquatableMixin {
   });
 
   /// Targets a named element, optionally guarded by [condition].
-  factory FlowTarget.element(
-    NodeId ref, {
-    FlowCondition? condition,
-  }) =>
+  factory FlowTarget.element(NodeId ref, {FlowCondition? condition}) =>
       FlowTarget._(elementRef: ref, condition: condition);
 
   /// Targets an inline gateway.
-  factory FlowTarget.gateway(
-    WfInlineGateway gw, {
-    FlowCondition? condition,
-  }) =>
+  factory FlowTarget.gateway(WfInlineGateway gw, {FlowCondition? condition}) =>
       FlowTarget._(inlineGateway: gw, condition: condition);
 
   /// Targets a [FlowBlock] (a set of branching sub-flows).
-  factory FlowTarget.block(
-    FlowBlock blk, {
-    FlowCondition? condition,
-  }) =>
+  factory FlowTarget.block(FlowBlock blk, {FlowCondition? condition}) =>
       FlowTarget._(block: blk, condition: condition);
 
   /// Whether this step is guarded by a condition.
@@ -149,10 +142,11 @@ class FlowTarget with EquatableMixin {
 /// ```
 ///
 /// The enclosing `-> { … }` is itself a [FlowTarget] with [FlowTarget.block].
-class FlowBlock with EquatableMixin {
+class FlowBlock extends Equatable {
   /// The branches of this block, each a separate [SequenceFlow].
   final List<SequenceFlow> branches;
 
+  /// Creates a [FlowBlock] wrapping the given [branches].
   const FlowBlock(this.branches);
 
   @override
@@ -206,7 +200,7 @@ class FlowBlock with EquatableMixin {
 /// - Split gateways must have exactly 1 incoming and ≥2 outgoing flows.
 /// - Boundary events must have no incoming sequence flows.
 /// - A sequence flow must not cross subprocess boundaries.
-class SequenceFlow with EquatableMixin implements FlowElement {
+class SequenceFlow extends Equatable implements FlowElement {
   /// A synthetic id for this flow — since sequence flows are not named
   /// elements, we generate one during parsing for symbol-table bookkeeping.
   @override
@@ -218,6 +212,8 @@ class SequenceFlow with EquatableMixin implements FlowElement {
   /// gateway, or a nested block.  The flow is executed step by step.
   final List<FlowTarget> path;
 
+  /// Creates a [SequenceFlow] with the given synthetic [id] and ordered
+  /// [path] of steps.
   const SequenceFlow({required this.id, required this.path});
 
   /// Convenience: build a simple linear flow from a list of element names.

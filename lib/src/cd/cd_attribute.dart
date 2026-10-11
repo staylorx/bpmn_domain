@@ -38,7 +38,7 @@ import 'cd_visibility.dart';
 /// The `/` prefix (e.g. `/int workingDays`) marks a derived attribute.
 /// Its value is computed from other attributes rather than stored.  In the
 /// domain model we represent this with [isDerived] = `true`.
-class CdAttribute with EquatableMixin {
+class CdAttribute extends Equatable {
   /// The attribute name, e.g. `orderID`, `workingDays`.
   final String name;
 
@@ -52,6 +52,8 @@ class CdAttribute with EquatableMixin {
   /// `true` when the attribute is derived (written with a `/` prefix).
   final bool isDerived;
 
+  /// Creates a [CdAttribute] with the given [name], [type], [visibility]
+  /// and [isDerived] flag.
   const CdAttribute({
     required this.name,
     required this.type,
@@ -66,18 +68,25 @@ class CdAttribute with EquatableMixin {
       CdAttribute(name: name, type: type, visibility: CdVisibility.public);
 
   /// Creates a derived `public` attribute.
-  factory CdAttribute.derived(String name, String type,
-          {CdVisibility visibility = CdVisibility.packageLocal}) =>
-      CdAttribute(
-          name: name, type: type, visibility: visibility, isDerived: true);
+  factory CdAttribute.derived(
+    String name,
+    String type, {
+    CdVisibility visibility = CdVisibility.packageLocal,
+  }) => CdAttribute(
+    name: name,
+    type: type,
+    visibility: visibility,
+    isDerived: true,
+  );
 
   @override
   List<Object?> get props => [name, type, visibility, isDerived];
 
   @override
   String toString() {
-    final vis =
-        visibility == CdVisibility.packageLocal ? '' : '${visibility.name} ';
+    final vis = visibility == CdVisibility.packageLocal
+        ? ''
+        : '${visibility.name} ';
     final derived = isDerived ? '/' : '';
     return '$vis$derived$type $name;';
   }

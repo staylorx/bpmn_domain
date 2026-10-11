@@ -61,7 +61,7 @@ enum SubProcessType {
 /// adhoc [allTasksCompleted == true] parallel noninterrupt subprocess
 ///   ReviewProcess { ... }
 /// ```
-class AdHocCharacteristics with EquatableMixin {
+class AdHocCharacteristics extends Equatable {
   /// The condition that indicates the ad-hoc subprocess is complete.
   final String completionCondition;
 
@@ -71,6 +71,8 @@ class AdHocCharacteristics with EquatableMixin {
   /// `true` → completing one activity does not cancel others (non-interrupt).
   final bool nonInterrupt;
 
+  /// Creates [AdHocCharacteristics] with the given [completionCondition],
+  /// optional [isParallel] and [nonInterrupt].
   const AdHocCharacteristics({
     required this.completionCondition,
     this.isParallel = false,
@@ -151,7 +153,7 @@ class AdHocCharacteristics with EquatableMixin {
 /// is a catch event is called an **event subprocess**.  It runs concurrently
 /// with the parent process when its trigger fires.  The grammar models this
 /// by the absence of sequence-flow connections to the subprocess.
-class WfSubProcess with EquatableMixin implements FlowElement {
+class WfSubProcess extends Equatable implements FlowElement {
   /// The unique name within the enclosing scope.
   @override
   final NodeId id;
@@ -174,6 +176,9 @@ class WfSubProcess with EquatableMixin implements FlowElement {
   /// Access modifier and stereotype annotations.
   final WfModifier modifier;
 
+  /// Creates a [WfSubProcess] with the given [id] and optional
+  /// [subProcessType], [adHocCharacteristics], [loop], [elements],
+  /// [boundaryEvents] and [modifier].
   const WfSubProcess({
     required this.id,
     this.subProcessType = SubProcessType.embedded,
@@ -187,35 +192,35 @@ class WfSubProcess with EquatableMixin implements FlowElement {
   // Convenience constructors ---------------------------------------------------
 
   /// Creates an empty embedded subprocess.
-  factory WfSubProcess.embedded(String name) => WfSubProcess(
-        id: NodeId(name),
-        subProcessType: SubProcessType.embedded,
-      );
+  factory WfSubProcess.embedded(String name) =>
+      WfSubProcess(id: NodeId(name), subProcessType: SubProcessType.embedded);
 
   /// Creates a transaction subprocess.
   factory WfSubProcess.transaction(String name) => WfSubProcess(
-        id: NodeId(name),
-        subProcessType: SubProcessType.transaction,
-      );
+    id: NodeId(name),
+    subProcessType: SubProcessType.transaction,
+  );
 
   /// Creates an ad-hoc subprocess.
   factory WfSubProcess.adhoc(
     String name, {
     required String completionCondition,
     bool parallel = false,
-  }) =>
-      WfSubProcess(
-        id: NodeId(name),
-        subProcessType: SubProcessType.adhoc,
-        adHocCharacteristics: AdHocCharacteristics(
-          completionCondition: completionCondition,
-          isParallel: parallel,
-        ),
-      );
+  }) => WfSubProcess(
+    id: NodeId(name),
+    subProcessType: SubProcessType.adhoc,
+    adHocCharacteristics: AdHocCharacteristics(
+      completionCondition: completionCondition,
+      isParallel: parallel,
+    ),
+  );
 
   // Derived properties ---------------------------------------------------------
 
+  /// `true` when this subprocess is a transaction subprocess.
   bool get isTransaction => subProcessType == SubProcessType.transaction;
+
+  /// `true` when this subprocess is an ad-hoc subprocess.
   bool get isAdHoc => subProcessType == SubProcessType.adhoc;
 
   /// `true` when this subprocess has no incoming/outgoing connections —
@@ -224,14 +229,14 @@ class WfSubProcess with EquatableMixin implements FlowElement {
 
   @override
   List<Object?> get props => [
-        id,
-        subProcessType,
-        adHocCharacteristics,
-        loop,
-        elements,
-        boundaryEvents,
-        modifier,
-      ];
+    id,
+    subProcessType,
+    adHocCharacteristics,
+    loop,
+    elements,
+    boundaryEvents,
+    modifier,
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -264,7 +269,7 @@ class WfSubProcess with EquatableMixin implements FlowElement {
 /// call-activity RunPaymentCheck calls PaymentValidationProcess
 ///   count [order.items] parallel;
 /// ```
-class WfCallActivity with EquatableMixin implements FlowElement {
+class WfCallActivity extends Equatable implements FlowElement {
   /// The unique name within the enclosing scope.
   @override
   final NodeId id;
@@ -282,6 +287,8 @@ class WfCallActivity with EquatableMixin implements FlowElement {
   /// Access modifier and stereotype annotations.
   final WfModifier modifier;
 
+  /// Creates a [WfCallActivity] that invokes [calledElement], with optional
+  /// [loop], [boundaryEvents] and [modifier].
   const WfCallActivity({
     required this.id,
     required this.calledElement,
@@ -290,16 +297,22 @@ class WfCallActivity with EquatableMixin implements FlowElement {
     this.modifier = WfModifier.none,
   });
 
+  /// Creates a [WfCallActivity] named [name] that calls the process named
+  /// [calledProcessName].
   factory WfCallActivity.simple({
     required String name,
     required String calledProcessName,
-  }) =>
-      WfCallActivity(
-        id: NodeId(name),
-        calledElement: NodeId(calledProcessName),
-      );
+  }) => WfCallActivity(
+    id: NodeId(name),
+    calledElement: NodeId(calledProcessName),
+  );
 
   @override
-  List<Object?> get props =>
-      [id, calledElement, loop, boundaryEvents, modifier];
+  List<Object?> get props => [
+    id,
+    calledElement,
+    loop,
+    boundaryEvents,
+    modifier,
+  ];
 }

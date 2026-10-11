@@ -15,16 +15,18 @@ import 'package:equatable/equatable.dart';
 /// | `[*]`      | Zero or more (many)             |
 /// | `[1..*]`   | One or more (at least one)      |
 /// | `[2..5]`   | Between 2 and 5 (bounded range) |
-class CdMultiplicity with EquatableMixin {
+class CdMultiplicity extends Equatable {
   /// Lower bound (0 or a positive integer).
   final int lower;
 
   /// Upper bound.  `-1` represents unlimited (`*`).
   final int upper;
 
+  /// Creates a [CdMultiplicity] with the given [lower] and [upper] bounds;
+  /// [upper] may be `-1` to mean unlimited.
   const CdMultiplicity({required this.lower, required this.upper})
-      : assert(lower >= 0),
-        assert(upper == -1 || upper >= lower);
+    : assert(lower >= 0),
+      assert(upper == -1 || upper >= lower);
 
   /// `[1]` — exactly one.
   static const CdMultiplicity one = CdMultiplicity(lower: 1, upper: 1);
@@ -38,6 +40,7 @@ class CdMultiplicity with EquatableMixin {
   /// `[1..*]` — one or more.
   static const CdMultiplicity atLeastOne = CdMultiplicity(lower: 1, upper: -1);
 
+  /// Creates a [CdMultiplicity] spanning [lower] to [upper].
   factory CdMultiplicity.range(int lower, int upper) =>
       CdMultiplicity(lower: lower, upper: upper);
 
@@ -119,7 +122,7 @@ enum CdAssociationKind {
 /// ```
 /// This means a `LeaveCard` has a collection of `LeaveEntry` objects
 /// accessible via the `entries` role.
-class CdAssociation with EquatableMixin {
+class CdAssociation extends Equatable {
   /// Optional name of the association itself (rarely used).
   final String? associationName;
 
@@ -141,6 +144,9 @@ class CdAssociation with EquatableMixin {
   /// The structural kind of the relationship.
   final CdAssociationKind kind;
 
+  /// Creates a [CdAssociation] from source to target with the given
+  /// [sourceMultiplicity] and [targetMultiplicity], plus optional
+  /// [associationName], [roleName] and [kind].
   const CdAssociation({
     required this.sourceType,
     required this.targetType,
@@ -158,37 +164,35 @@ class CdAssociation with EquatableMixin {
     required String source,
     required String target,
     String? roleName,
-  }) =>
-      CdAssociation(
-        sourceType: source,
-        targetType: target,
-        sourceMultiplicity: CdMultiplicity.one,
-        targetMultiplicity: CdMultiplicity.many,
-        roleName: roleName,
-      );
+  }) => CdAssociation(
+    sourceType: source,
+    targetType: target,
+    sourceMultiplicity: CdMultiplicity.one,
+    targetMultiplicity: CdMultiplicity.many,
+    roleName: roleName,
+  );
 
   /// `association [1] A -> B [1]` — one-to-one relationship.
   factory CdAssociation.oneToOne({
     required String source,
     required String target,
-  }) =>
-      CdAssociation(
-        sourceType: source,
-        targetType: target,
-        sourceMultiplicity: CdMultiplicity.one,
-        targetMultiplicity: CdMultiplicity.one,
-      );
+  }) => CdAssociation(
+    sourceType: source,
+    targetType: target,
+    sourceMultiplicity: CdMultiplicity.one,
+    targetMultiplicity: CdMultiplicity.one,
+  );
 
   @override
   List<Object?> get props => [
-        associationName,
-        roleName,
-        sourceMultiplicity,
-        targetMultiplicity,
-        sourceType,
-        targetType,
-        kind,
-      ];
+    associationName,
+    roleName,
+    sourceMultiplicity,
+    targetMultiplicity,
+    sourceType,
+    targetType,
+    kind,
+  ];
 
   @override
   String toString() {

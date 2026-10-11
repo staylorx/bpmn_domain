@@ -21,7 +21,7 @@ import '../value_objects/node_id.dart';
 ///   (process) => print('Process "${process.id}" is valid'),
 /// );
 /// ```
-sealed class WorkflowFailure with EquatableMixin {
+sealed class WorkflowFailure extends Equatable {
   const WorkflowFailure();
 
   /// A human-readable description of the failure.
@@ -36,8 +36,10 @@ sealed class WorkflowFailure with EquatableMixin {
 ///
 /// CoCo: `AdHocSubProcessContainsAtLeastOneActivity`
 final class AdHocSubProcessEmpty extends WorkflowFailure {
+  /// The [NodeId] of the offending ad-hoc subprocess.
   final NodeId subProcessId;
 
+  /// Creates an [AdHocSubProcessEmpty] failure for [subProcessId].
   const AdHocSubProcessEmpty(this.subProcessId);
 
   @override
@@ -52,8 +54,10 @@ final class AdHocSubProcessEmpty extends WorkflowFailure {
 ///
 /// CoCo: `AdHocSubProcessHasNoStartAndEndEvent`
 final class AdHocSubProcessHasStartOrEndEvent extends WorkflowFailure {
+  /// The [NodeId] of the offending ad-hoc subprocess.
   final NodeId subProcessId;
 
+  /// Creates an [AdHocSubProcessHasStartOrEndEvent] failure for [subProcessId].
   const AdHocSubProcessHasStartOrEndEvent(this.subProcessId);
 
   @override
@@ -68,9 +72,13 @@ final class AdHocSubProcessHasStartOrEndEvent extends WorkflowFailure {
 ///
 /// CoCo: `CalledElementDoesExist`
 final class CalledElementNotFound extends WorkflowFailure {
+  /// The [NodeId] of the call-activity.
   final NodeId callActivityId;
+
+  /// The [NodeId] of the process that was referenced but not found.
   final NodeId calledElement;
 
+  /// Creates a [CalledElementNotFound] failure for [callActivityId] referencing [calledElement].
   const CalledElementNotFound({
     required this.callActivityId,
     required this.calledElement,
@@ -89,8 +97,10 @@ final class CalledElementNotFound extends WorkflowFailure {
 ///
 /// CoCo: `CompensationActivityHasNoIncomingOrOutgoingFlow`
 final class CompensationActivityHasFlow extends WorkflowFailure {
+  /// The [NodeId] of the offending compensation activity.
   final NodeId activityId;
 
+  /// Creates a [CompensationActivityHasFlow] failure for [activityId].
   const CompensationActivityHasFlow(this.activityId);
 
   @override
@@ -106,8 +116,10 @@ final class CompensationActivityHasFlow extends WorkflowFailure {
 ///
 /// CoCo: `EventSubProcessHasNoIncomingOrOutgoingFlow`
 final class EventSubProcessHasFlow extends WorkflowFailure {
+  /// The [NodeId] of the offending event subprocess.
   final NodeId subProcessId;
 
+  /// Creates an [EventSubProcessHasFlow] failure for [subProcessId].
   const EventSubProcessHasFlow(this.subProcessId);
 
   @override
@@ -123,9 +135,13 @@ final class EventSubProcessHasFlow extends WorkflowFailure {
 ///
 /// CoCo: `EventSubProcessHasOnlyOneStartEvent`
 final class EventSubProcessStartEventCount extends WorkflowFailure {
+  /// The [NodeId] of the offending event subprocess.
   final NodeId subProcessId;
+
+  /// The number of start events that were found.
   final int found;
 
+  /// Creates an [EventSubProcessStartEventCount] failure for [subProcessId] with [found] start events.
   const EventSubProcessStartEventCount({
     required this.subProcessId,
     required this.found,
@@ -144,16 +160,21 @@ final class EventSubProcessStartEventCount extends WorkflowFailure {
 ///
 /// CoCo: `LoopCountExpressionReturnsIntegerNumber`
 final class LoopCountNotInteger extends WorkflowFailure {
+  /// The [NodeId] of the offending activity.
   final NodeId activityId;
+
+  /// The loop-count expression that is not an integer.
   final String expression;
 
+  /// Creates a [LoopCountNotInteger] failure for [activityId] and [expression].
   const LoopCountNotInteger({
     required this.activityId,
     required this.expression,
   });
 
   @override
-  String get message => 'Loop count expression "$expression" on activity '
+  String get message =>
+      'Loop count expression "$expression" on activity '
       '"${activityId.value}" must evaluate to an integer.';
 
   @override
@@ -168,8 +189,10 @@ final class LoopCountNotInteger extends WorkflowFailure {
 ///
 /// CoCo: `ProcessHasNoDeadNodes`
 final class DeadNode extends WorkflowFailure {
+  /// The [NodeId] of the unreachable dead node.
   final NodeId nodeId;
 
+  /// Creates a [DeadNode] failure for [nodeId].
   const DeadNode(this.nodeId);
 
   @override
@@ -186,8 +209,10 @@ final class DeadNode extends WorkflowFailure {
 ///
 /// CoCo: `ProcessHasNoDisconnectedComponents`
 final class DisconnectedComponent extends WorkflowFailure {
+  /// The [NodeId]s belonging to the disconnected component.
   final List<NodeId> componentNodes;
 
+  /// Creates a [DisconnectedComponent] failure for [componentNodes].
   const DisconnectedComponent(this.componentNodes);
 
   @override
@@ -203,12 +228,15 @@ final class DisconnectedComponent extends WorkflowFailure {
 ///
 /// CoCo: `ProcessHasNoInfiniteLoop`
 final class InfiniteLoop extends WorkflowFailure {
+  /// The [NodeId]s forming the loop with no exit.
   final List<NodeId> loopNodes;
 
+  /// Creates an [InfiniteLoop] failure for [loopNodes].
   const InfiniteLoop(this.loopNodes);
 
   @override
-  String get message => 'The process contains an infinite loop through nodes: '
+  String get message =>
+      'The process contains an infinite loop through nodes: '
       '${loopNodes.map((n) => n.value).join(' → ')}.';
 
   @override
@@ -220,8 +248,10 @@ final class InfiniteLoop extends WorkflowFailure {
 ///
 /// CoCo: `ProcessHasNoLackOfSync`
 final class LackOfSync extends WorkflowFailure {
+  /// The [NodeId] of the merge gateway lacking synchronisation.
   final NodeId mergeGatewayId;
 
+  /// Creates a [LackOfSync] failure for [mergeGatewayId].
   const LackOfSync(this.mergeGatewayId);
 
   @override
@@ -238,8 +268,10 @@ final class LackOfSync extends WorkflowFailure {
 ///
 /// CoCo: `ProcessHasNoSyncDeadlock`
 final class SyncDeadlock extends WorkflowFailure {
+  /// The [NodeId] of the merge gateway that can deadlock.
   final NodeId mergeGatewayId;
 
+  /// Creates a [SyncDeadlock] failure for [mergeGatewayId].
   const SyncDeadlock(this.mergeGatewayId);
 
   @override
@@ -256,8 +288,10 @@ final class SyncDeadlock extends WorkflowFailure {
 ///
 /// CoCo: `ProcessNetIsSound`
 final class ProcessNotSound extends WorkflowFailure {
+  /// A human-readable explanation of why the process is not sound.
   final String reason;
 
+  /// Creates a [ProcessNotSound] failure with [reason].
   const ProcessNotSound(this.reason);
 
   @override
@@ -275,8 +309,10 @@ final class ProcessNotSound extends WorkflowFailure {
 ///
 /// CoCo: `StartEventIsNotThrowing`
 final class StartEventIsThrowing extends WorkflowFailure {
+  /// The [NodeId] of the offending start event.
   final NodeId eventId;
 
+  /// Creates a [StartEventIsThrowing] failure for [eventId].
   const StartEventIsThrowing(this.eventId);
 
   @override
@@ -291,8 +327,10 @@ final class StartEventIsThrowing extends WorkflowFailure {
 ///
 /// CoCo: `EndEventIsNotCatching`
 final class EndEventIsCatching extends WorkflowFailure {
+  /// The [NodeId] of the offending end event.
   final NodeId eventId;
 
+  /// Creates an [EndEventIsCatching] failure for [eventId].
   const EndEventIsCatching(this.eventId);
 
   @override
@@ -307,6 +345,7 @@ final class EndEventIsCatching extends WorkflowFailure {
 ///
 /// CoCo: `AtLeastOneEndEventIfStartEventIsUsed`
 final class NoEndEventWithStartEvent extends WorkflowFailure {
+  /// Creates a [NoEndEventWithStartEvent] failure.
   const NoEndEventWithStartEvent();
 
   @override
@@ -320,8 +359,10 @@ final class NoEndEventWithStartEvent extends WorkflowFailure {
 ///
 /// CoCo: `BoundaryEventHasNoIncomingFlow`
 final class BoundaryEventHasIncomingFlow extends WorkflowFailure {
+  /// The [NodeId] of the boundary event with an incoming flow.
   final NodeId eventId;
 
+  /// Creates a [BoundaryEventHasIncomingFlow] failure for [eventId].
   const BoundaryEventHasIncomingFlow(this.eventId);
 
   @override
@@ -340,8 +381,10 @@ final class BoundaryEventHasIncomingFlow extends WorkflowFailure {
 ///
 /// CoCo: `AtMostOneDefaultBranch`
 final class MultipleDefaultBranches extends WorkflowFailure {
+  /// The [NodeId] of the split gateway with multiple default branches.
   final NodeId splitGatewayId;
 
+  /// Creates a [MultipleDefaultBranches] failure for [splitGatewayId].
   const MultipleDefaultBranches(this.splitGatewayId);
 
   @override
@@ -357,8 +400,10 @@ final class MultipleDefaultBranches extends WorkflowFailure {
 ///
 /// CoCo: `DefaultBranchIsLastBranch`
 final class DefaultBranchNotLast extends WorkflowFailure {
+  /// The [NodeId] of the gateway whose default branch is not last.
   final NodeId gatewayId;
 
+  /// Creates a [DefaultBranchNotLast] failure for [gatewayId].
   const DefaultBranchNotLast(this.gatewayId);
 
   @override
@@ -374,8 +419,10 @@ final class DefaultBranchNotLast extends WorkflowFailure {
 ///
 /// CoCo: `EndEventHasNoOutgoingFlow`
 final class EndEventHasOutgoingFlow extends WorkflowFailure {
+  /// The [NodeId] of the end event with an outgoing flow.
   final NodeId eventId;
 
+  /// Creates an [EndEventHasOutgoingFlow] failure for [eventId].
   const EndEventHasOutgoingFlow(this.eventId);
 
   @override
@@ -390,9 +437,13 @@ final class EndEventHasOutgoingFlow extends WorkflowFailure {
 ///
 /// CoCo: `MergeGatewayHasMultipleIncomingFlow`
 final class MergeGatewayTooFewIncomingFlows extends WorkflowFailure {
+  /// The [NodeId] of the merge gateway with too few incoming flows.
   final NodeId gatewayId;
+
+  /// The number of incoming flows that were found.
   final int found;
 
+  /// Creates a [MergeGatewayTooFewIncomingFlows] failure for [gatewayId] with [found] incoming flows.
   const MergeGatewayTooFewIncomingFlows({
     required this.gatewayId,
     required this.found,
@@ -411,9 +462,13 @@ final class MergeGatewayTooFewIncomingFlows extends WorkflowFailure {
 ///
 /// CoCo: `SplitGatewayHasMultipleOutgoingFlow`
 final class SplitGatewayTooFewOutgoingFlows extends WorkflowFailure {
+  /// The [NodeId] of the split gateway with too few outgoing flows.
   final NodeId gatewayId;
+
+  /// The number of outgoing flows that were found.
   final int found;
 
+  /// Creates a [SplitGatewayTooFewOutgoingFlows] failure for [gatewayId] with [found] outgoing flows.
   const SplitGatewayTooFewOutgoingFlows({
     required this.gatewayId,
     required this.found,
@@ -432,16 +487,21 @@ final class SplitGatewayTooFewOutgoingFlows extends WorkflowFailure {
 ///
 /// CoCo: `SequenceFlowNodeReferencesExist`
 final class UnresolvedNodeReference extends WorkflowFailure {
+  /// The [NodeId] of the node that was referenced but not defined.
   final NodeId referencedNode;
+
+  /// The [NodeId] of the flow containing the reference.
   final NodeId fromFlow;
 
+  /// Creates an [UnresolvedNodeReference] failure for [referencedNode] referenced from [fromFlow].
   const UnresolvedNodeReference({
     required this.referencedNode,
     required this.fromFlow,
   });
 
   @override
-  String get message => 'Flow "${fromFlow.value}" references undefined node '
+  String get message =>
+      'Flow "${fromFlow.value}" references undefined node '
       '"${referencedNode.value}".';
 
   @override
@@ -456,8 +516,10 @@ final class UnresolvedNodeReference extends WorkflowFailure {
 ///
 /// CoCo: `EventGatewayDoesNotMixMessageEventsAndReceiveTasks`
 final class EventGatewayMixedTargetTypes extends WorkflowFailure {
+  /// The [NodeId] of the event gateway mixing target types.
   final NodeId gatewayId;
 
+  /// Creates an [EventGatewayMixedTargetTypes] failure for [gatewayId].
   const EventGatewayMixedTargetTypes(this.gatewayId);
 
   @override
@@ -473,8 +535,10 @@ final class EventGatewayMixedTargetTypes extends WorkflowFailure {
 ///
 /// CoCo: `EventGatewayIsSplit`
 final class EventGatewayIsNotSplit extends WorkflowFailure {
+  /// The [NodeId] of the event gateway that is not a split.
   final NodeId gatewayId;
 
+  /// Creates an [EventGatewayIsNotSplit] failure for [gatewayId].
   const EventGatewayIsNotSplit(this.gatewayId);
 
   @override
@@ -494,8 +558,10 @@ final class EventGatewayIsNotSplit extends WorkflowFailure {
 ///
 /// CoCo: conformance checking
 final class TaskNotIncarnated extends WorkflowFailure {
+  /// The [NodeId] of the task that is not incarnated.
   final NodeId taskId;
 
+  /// Creates a [TaskNotIncarnated] failure for [taskId].
   const TaskNotIncarnated(this.taskId);
 
   @override
@@ -512,9 +578,13 @@ final class TaskNotIncarnated extends WorkflowFailure {
 ///
 /// CoCo: conformance checking (AntiPatternMerge)
 final class ParallelBranchesClosedWithXor extends WorkflowFailure {
+  /// The [NodeId] of the merge gateway that closes parallel branches with XOR.
   final NodeId mergeGatewayId;
+
+  /// The [NodeId]s along the parallel branch being closed with XOR.
   final List<NodeId> parallelBranch;
 
+  /// Creates a [ParallelBranchesClosedWithXor] failure for [mergeGatewayId] and [parallelBranch].
   const ParallelBranchesClosedWithXor({
     required this.mergeGatewayId,
     required this.parallelBranch,

@@ -69,6 +69,7 @@ sealed class GatewayKind {
 /// merge xor StartIteration;
 /// ```
 final class ExclusiveGateway extends GatewayKind {
+  /// Creates an exclusive (`xor`) gateway kind.
   const ExclusiveGateway();
 
   @override
@@ -89,6 +90,7 @@ final class ExclusiveGateway extends GatewayKind {
 /// merge ior WaitForActive;
 /// ```
 final class InclusiveGateway extends GatewayKind {
+  /// Creates an inclusive (`ior`) gateway kind.
   const InclusiveGateway();
 
   @override
@@ -107,6 +109,7 @@ final class InclusiveGateway extends GatewayKind {
 /// merge and MergeWork;
 /// ```
 final class ParallelGateway extends GatewayKind {
+  /// Creates a parallel (`and`) gateway kind.
   const ParallelGateway();
 
   @override
@@ -127,6 +130,7 @@ final class ParallelGateway extends GatewayKind {
 /// split receive first WaitForPaymentOrTimeout;
 /// ```
 final class ExclusiveEventGateway extends GatewayKind {
+  /// Creates an exclusive event-based (`receive first`) gateway kind.
   const ExclusiveEventGateway();
 
   @override
@@ -143,6 +147,7 @@ final class ExclusiveEventGateway extends GatewayKind {
 /// split receive all AwaitAllConfirmations;
 /// ```
 final class ParallelEventGateway extends GatewayKind {
+  /// Creates a parallel event-based (`receive all`) gateway kind.
   const ParallelEventGateway();
 
   @override
@@ -164,6 +169,7 @@ final class ComplexGateway extends GatewayKind {
   /// The raw guard expression, e.g. `majority(votes) > 0.5`.
   final String guard;
 
+  /// Creates a [ComplexGateway] with the given [guard] expression.
   const ComplexGateway({required this.guard});
 
   @override
@@ -208,7 +214,7 @@ final class ComplexGateway extends GatewayKind {
 /// Both share the same [GatewayDirection] and [GatewayKind] value space.
 /// [WfGateway] is a symbol with a name; [WfInlineGateway] is anonymous and
 /// embedded in the flow syntax.
-class WfGateway with EquatableMixin implements FlowElement {
+class WfGateway extends Equatable implements FlowElement {
   /// The unique name of this gateway within its enclosing scope.
   @override
   final NodeId id;
@@ -226,6 +232,8 @@ class WfGateway with EquatableMixin implements FlowElement {
   /// must arrive to trigger the merge, before the guard is evaluated.
   final int? activationCount;
 
+  /// Creates a [WfGateway] with the given [id], [direction] and [kind], plus
+  /// optional [modifier] and [activationCount].
   const WfGateway({
     required this.id,
     required this.direction,
@@ -238,52 +246,52 @@ class WfGateway with EquatableMixin implements FlowElement {
 
   /// Creates an exclusive-XOR split gateway.
   factory WfGateway.splitXor(String name) => WfGateway(
-        id: NodeId(name),
-        direction: GatewayDirection.split,
-        kind: const ExclusiveGateway(),
-      );
+    id: NodeId(name),
+    direction: GatewayDirection.split,
+    kind: const ExclusiveGateway(),
+  );
 
   /// Creates an exclusive-XOR merge gateway.
   factory WfGateway.mergeXor(String name) => WfGateway(
-        id: NodeId(name),
-        direction: GatewayDirection.merge,
-        kind: const ExclusiveGateway(),
-      );
+    id: NodeId(name),
+    direction: GatewayDirection.merge,
+    kind: const ExclusiveGateway(),
+  );
 
   /// Creates a parallel-AND split gateway.
   factory WfGateway.splitAnd(String name) => WfGateway(
-        id: NodeId(name),
-        direction: GatewayDirection.split,
-        kind: const ParallelGateway(),
-      );
+    id: NodeId(name),
+    direction: GatewayDirection.split,
+    kind: const ParallelGateway(),
+  );
 
   /// Creates a parallel-AND merge gateway.
   factory WfGateway.mergeAnd(String name) => WfGateway(
-        id: NodeId(name),
-        direction: GatewayDirection.merge,
-        kind: const ParallelGateway(),
-      );
+    id: NodeId(name),
+    direction: GatewayDirection.merge,
+    kind: const ParallelGateway(),
+  );
 
   /// Creates an inclusive-IOR split gateway.
   factory WfGateway.splitIor(String name) => WfGateway(
-        id: NodeId(name),
-        direction: GatewayDirection.split,
-        kind: const InclusiveGateway(),
-      );
+    id: NodeId(name),
+    direction: GatewayDirection.split,
+    kind: const InclusiveGateway(),
+  );
 
   /// Creates a parallel event-based split gateway.
   factory WfGateway.splitReceiveAll(String name) => WfGateway(
-        id: NodeId(name),
-        direction: GatewayDirection.split,
-        kind: const ParallelEventGateway(),
-      );
+    id: NodeId(name),
+    direction: GatewayDirection.split,
+    kind: const ParallelEventGateway(),
+  );
 
   /// Creates an exclusive event-based split gateway.
   factory WfGateway.splitReceiveFirst(String name) => WfGateway(
-        id: NodeId(name),
-        direction: GatewayDirection.split,
-        kind: const ExclusiveEventGateway(),
-      );
+    id: NodeId(name),
+    direction: GatewayDirection.split,
+    kind: const ExclusiveEventGateway(),
+  );
 
   @override
   List<Object?> get props => [id, direction, kind, modifier, activationCount];
@@ -308,10 +316,14 @@ class WfGateway with EquatableMixin implements FlowElement {
 /// ```
 /// A -> split xor -> { [condX] B; [_] C; };
 /// ```
-class WfInlineGateway with EquatableMixin {
+class WfInlineGateway extends Equatable {
+  /// Whether this inline gateway splits or merges flows.
   final GatewayDirection direction;
+
+  /// The routing logic of this inline gateway.
   final GatewayKind kind;
 
+  /// Creates a [WfInlineGateway] with the given [direction] and [kind].
   const WfInlineGateway({required this.direction, required this.kind});
 
   @override

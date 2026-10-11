@@ -43,7 +43,7 @@ import 'flow_element.dart';
 /// The [type] field references a [WfTypeRef] which the parser must later
 /// resolve against imported symbol tables.  Built-in types like `String` are
 /// always available.
-class WfNotification with EquatableMixin implements FlowElement {
+class WfNotification extends Equatable implements FlowElement {
   /// The unique name of this notification within its enclosing scope.
   @override
   final NodeId id;
@@ -57,6 +57,8 @@ class WfNotification with EquatableMixin implements FlowElement {
   /// Access modifier and stereotype annotations.
   final WfModifier modifier;
 
+  /// Creates a [WfNotification] with the given [id], [kind] and [type],
+  /// plus optional [modifier].
   const WfNotification({
     required this.id,
     required this.kind,
@@ -68,24 +70,24 @@ class WfNotification with EquatableMixin implements FlowElement {
 
   /// Creates a `message` notification with the given payload type.
   factory WfNotification.message(String name, WfTypeRef type) => WfNotification(
-        id: NodeId(name),
-        kind: NotificationKind.message,
-        type: type,
-      );
+    id: NodeId(name),
+    kind: NotificationKind.message,
+    type: type,
+  );
 
   /// Creates a `signal` notification with the given payload type.
   factory WfNotification.signal(String name, WfTypeRef type) => WfNotification(
-        id: NodeId(name),
-        kind: NotificationKind.signal,
-        type: type,
-      );
+    id: NodeId(name),
+    kind: NotificationKind.signal,
+    type: type,
+  );
 
   /// Creates an `error` notification (exception payload).
   factory WfNotification.error(String name, WfTypeRef type) => WfNotification(
-        id: NodeId(name),
-        kind: NotificationKind.error,
-        type: type,
-      );
+    id: NodeId(name),
+    kind: NotificationKind.error,
+    type: type,
+  );
 
   /// Creates an `escalation` notification.
   factory WfNotification.escalation(String name, WfTypeRef type) =>
@@ -97,9 +99,16 @@ class WfNotification with EquatableMixin implements FlowElement {
 
   // Derived helpers -----------------------------------------------------------
 
+  /// `true` when this notification is a message.
   bool get isMessage => kind == NotificationKind.message;
+
+  /// `true` when this notification is a signal.
   bool get isSignal => kind == NotificationKind.signal;
+
+  /// `true` when this notification is an error.
   bool get isError => kind == NotificationKind.error;
+
+  /// `true` when this notification is an escalation.
   bool get isEscalation => kind == NotificationKind.escalation;
 
   @override

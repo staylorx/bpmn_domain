@@ -50,7 +50,7 @@ import 'flow_element.dart';
 /// The optional [implementation] string carries an expression, URL, or
 /// inline script that describes how the operation is realised.  In
 /// model-to-code generation this might become a method call expression.
-class WfOperation with EquatableMixin implements FlowElement {
+class WfOperation extends Equatable implements FlowElement {
   /// The unique name of this operation within its enclosing scope.
   @override
   final NodeId id;
@@ -71,6 +71,8 @@ class WfOperation with EquatableMixin implements FlowElement {
   /// Access modifier and stereotype annotations.
   final WfModifier modifier;
 
+  /// Creates a [WfOperation] with the given [id] and [inParam], plus optional
+  /// [outParam], [thrownErrors], [implementation] and [modifier].
   const WfOperation({
     required this.id,
     required this.inParam,
@@ -87,22 +89,15 @@ class WfOperation with EquatableMixin implements FlowElement {
     required String name,
     required String input,
     required String output,
-  }) =>
-      WfOperation(
-        id: NodeId(name),
-        inParam: NodeId(input),
-        outParam: NodeId(output),
-      );
+  }) => WfOperation(
+    id: NodeId(name),
+    inParam: NodeId(input),
+    outParam: NodeId(output),
+  );
 
   /// Creates a one-way (fire-and-forget) operation.
-  factory WfOperation.oneWay({
-    required String name,
-    required String input,
-  }) =>
-      WfOperation(
-        id: NodeId(name),
-        inParam: NodeId(input),
-      );
+  factory WfOperation.oneWay({required String name, required String input}) =>
+      WfOperation(id: NodeId(name), inParam: NodeId(input));
 
   /// `true` when this operation produces an output.
   bool get hasOutput => outParam != null;
@@ -111,6 +106,12 @@ class WfOperation with EquatableMixin implements FlowElement {
   bool get canThrowErrors => thrownErrors.isNotEmpty;
 
   @override
-  List<Object?> get props =>
-      [id, inParam, outParam, thrownErrors, implementation, modifier];
+  List<Object?> get props => [
+    id,
+    inParam,
+    outParam,
+    thrownErrors,
+    implementation,
+    modifier,
+  ];
 }

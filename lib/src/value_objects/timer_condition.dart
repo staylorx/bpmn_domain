@@ -27,11 +27,17 @@ sealed class TimerCondition {
 /// A wall-clock time value (hours:minutes[:seconds]).
 ///
 /// Used as part of [AtTimerCondition] and optionally [OnDateTimerCondition].
-class TimeOfDay with EquatableMixin {
+class TimeOfDay extends Equatable {
+  /// The hour component (`0`–`23`).
   final int hours;
+
+  /// The minute component (`0`–`59`).
   final int minutes;
+
+  /// The optional second component (`0`–`59`).
   final int? seconds;
 
+  /// Creates a [TimeOfDay] from [hours], [minutes] and optional [seconds].
   const TimeOfDay({required this.hours, required this.minutes, this.seconds});
 
   @override
@@ -54,13 +60,22 @@ class TimeOfDay with EquatableMixin {
 // ---------------------------------------------------------------------------
 
 /// A calendar date (year-month-day).
-class CalendarDate with EquatableMixin {
+class CalendarDate extends Equatable {
+  /// The year component.
   final int year;
+
+  /// The month component (`1`–`12`).
   final int month;
+
+  /// The day-of-month component (`1`–`31`).
   final int day;
 
-  const CalendarDate(
-      {required this.year, required this.month, required this.day});
+  /// Creates a [CalendarDate] from [year], [month] and [day].
+  const CalendarDate({
+    required this.year,
+    required this.month,
+    required this.day,
+  });
 
   @override
   List<Object?> get props => [year, month, day];
@@ -84,8 +99,10 @@ class CalendarDate with EquatableMixin {
 /// event DailyStandup catch timer [at 09:00];
 /// ```
 final class AtTimerCondition extends TimerCondition with EquatableMixin {
+  /// The wall-clock [TimeOfDay] at which the event fires.
   final TimeOfDay time;
 
+  /// Creates an [AtTimerCondition] that fires at [time] each day.
   const AtTimerCondition(this.time);
 
   @override
@@ -110,9 +127,13 @@ final class AtTimerCondition extends TimerCondition with EquatableMixin {
 /// event NewYearStart    catch timer [on 2027-01-01];
 /// ```
 final class OnDateTimerCondition extends TimerCondition with EquatableMixin {
+  /// The [CalendarDate] on which the event fires.
   final CalendarDate date;
+
+  /// Optional time-of-day; when null the event fires at the day's start.
   final AtTimerCondition? atTime;
 
+  /// Creates an [OnDateTimerCondition] for [date], optionally at [atTime].
   const OnDateTimerCondition({required this.date, this.atTime});
 
   @override
@@ -143,6 +164,7 @@ final class AfterPeriodCondition extends TimerCondition with EquatableMixin {
   /// ISO 8601 duration string, e.g. `PT4H`, `P2D`.
   final String period;
 
+  /// Creates an [AfterPeriodCondition] that fires after `period` elapses.
   const AfterPeriodCondition(this.period);
 
   @override
@@ -176,11 +198,9 @@ final class EveryTimeCondition extends TimerCondition with EquatableMixin {
   /// ISO 8601 duration between firings, e.g. `PT1H`, `P1W`.
   final String period;
 
-  const EveryTimeCondition({
-    required this.period,
-    this.startDate,
-    this.times,
-  });
+  /// Creates an [EveryTimeCondition] at [period], optionally timed from
+  /// [startDate] and capped at [times] firings.
+  const EveryTimeCondition({required this.period, this.startDate, this.times});
 
   @override
   List<Object?> get props => [startDate, times, period];
@@ -213,6 +233,7 @@ final class CronTimerCondition extends TimerCondition with EquatableMixin {
   /// The raw cron expression string.
   final String value;
 
+  /// Creates a [CronTimerCondition] from the raw cron [value].
   const CronTimerCondition(this.value);
 
   @override

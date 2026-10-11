@@ -2,10 +2,14 @@ import 'package:equatable/equatable.dart';
 import 'cd_visibility.dart';
 
 /// A parameter in a [CdMethod] signature.
-class CdMethodParameter with EquatableMixin {
+class CdMethodParameter extends Equatable {
+  /// The parameter's name.
   final String name;
+
+  /// The parameter's declared type.
   final String type;
 
+  /// Creates a [CdMethodParameter] with the given [name] and [type].
   const CdMethodParameter({required this.name, required this.type});
 
   @override
@@ -32,7 +36,7 @@ class CdMethodParameter with EquatableMixin {
 ///   public boolean checkAvailability(String productID, int quantity);
 /// }
 /// ```
-class CdMethod with EquatableMixin {
+class CdMethod extends Equatable {
   /// The method name.
   final String name;
 
@@ -51,6 +55,8 @@ class CdMethod with EquatableMixin {
   /// `true` if the method is `static`.
   final bool isStatic;
 
+  /// Creates a [CdMethod] with the given [name] and [returnType], plus
+  /// optional [parameters], [visibility], [isAbstract] and [isStatic].
   const CdMethod({
     required this.name,
     required this.returnType,
@@ -61,13 +67,20 @@ class CdMethod with EquatableMixin {
   });
 
   @override
-  List<Object?> get props =>
-      [name, returnType, parameters, visibility, isAbstract, isStatic];
+  List<Object?> get props => [
+    name,
+    returnType,
+    parameters,
+    visibility,
+    isAbstract,
+    isStatic,
+  ];
 
   @override
   String toString() {
-    final vis =
-        visibility == CdVisibility.packageLocal ? '' : '${visibility.name} ';
+    final vis = visibility == CdVisibility.packageLocal
+        ? ''
+        : '${visibility.name} ';
     final abs = isAbstract ? 'abstract ' : '';
     final stat = isStatic ? 'static ' : '';
     final params = parameters.join(', ');

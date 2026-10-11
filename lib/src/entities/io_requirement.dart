@@ -27,7 +27,7 @@ import '../value_objects/wf_type_ref.dart';
 /// - [whileExecuting] — `true` when `!` suffix is present (can be produced
 ///   during execution).
 /// - [alias] — a renamed binding for the data within this scope.
-class WfDataIO with EquatableMixin {
+class WfDataIO extends Equatable {
   /// The referenced data element's name.
   final NodeId name;
 
@@ -46,6 +46,8 @@ class WfDataIO with EquatableMixin {
   /// A local alias name for the data within this scope.
   final String? alias;
 
+  /// Creates a [WfDataIO] item referencing [name], with optional [type],
+  /// [loop], [optional], [whileExecuting] and [alias].
   const WfDataIO({
     required this.name,
     this.type,
@@ -56,8 +58,14 @@ class WfDataIO with EquatableMixin {
   });
 
   @override
-  List<Object?> get props =>
-      [name, type, loop, optional, whileExecuting, alias];
+  List<Object?> get props => [
+    name,
+    type,
+    loop,
+    optional,
+    whileExecuting,
+    alias,
+  ];
 }
 
 // ---------------------------------------------------------------------------
@@ -69,10 +77,11 @@ class WfDataIO with EquatableMixin {
 /// A data set can be:
 /// - A **single** item: `in order:Order;`
 /// - A **multi-item** set: `in { order:Order, checker:Checker };`
-class WfDataSet with EquatableMixin {
+class WfDataSet extends Equatable {
   /// The items in this data set.
   final List<WfDataIO> items;
 
+  /// Creates a [WfDataSet] containing the given [items].
   const WfDataSet(this.items);
 
   /// Creates a data set with a single item.
@@ -116,19 +125,20 @@ final class WfIOSet extends WfIORequirement with EquatableMixin {
   /// The data items in this I/O set.
   final WfDataSet dataSet;
 
+  /// Creates a [WfIOSet] with the given [isInput] flag and [dataSet].
   const WfIOSet({required this.isInput, required this.dataSet});
 
   /// Convenience: create an input I/O set with one named, typed item.
   factory WfIOSet.inputItem(String name, WfTypeRef type) => WfIOSet(
-        isInput: true,
-        dataSet: WfDataSet.single(WfDataIO(name: NodeId(name), type: type)),
-      );
+    isInput: true,
+    dataSet: WfDataSet.single(WfDataIO(name: NodeId(name), type: type)),
+  );
 
   /// Convenience: create an output I/O set with one named, typed item.
   factory WfIOSet.outputItem(String name, WfTypeRef type) => WfIOSet(
-        isInput: false,
-        dataSet: WfDataSet.single(WfDataIO(name: NodeId(name), type: type)),
-      );
+    isInput: false,
+    dataSet: WfDataSet.single(WfDataIO(name: NodeId(name), type: type)),
+  );
 
   @override
   List<Object?> get props => [isInput, dataSet];
@@ -149,9 +159,13 @@ final class WfIOSet extends WfIORequirement with EquatableMixin {
 /// I/O rules allow a process or task to declare precise data-flow
 /// transformations rather than simply listing inputs and outputs separately.
 final class WfIORule extends WfIORequirement with EquatableMixin {
+  /// The data set consumed on the input side of the rule.
   final WfDataSet inputSet;
+
+  /// The data set produced on the output side of the rule.
   final WfDataSet outputSet;
 
+  /// Creates a [WfIORule] mapping [inputSet] to [outputSet].
   const WfIORule({required this.inputSet, required this.outputSet});
 
   @override

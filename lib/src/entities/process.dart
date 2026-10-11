@@ -42,7 +42,7 @@ import 'io_requirement.dart';
 ///   end event OrderCompleted;
 /// }
 /// ```
-class WfLane with EquatableMixin implements FlowElement {
+class WfLane extends Equatable implements FlowElement {
   /// The unique name of this lane within its enclosing process.
   @override
   final NodeId id;
@@ -53,6 +53,8 @@ class WfLane with EquatableMixin implements FlowElement {
   /// Access modifier and stereotype annotations.
   final WfModifier modifier;
 
+  /// Creates a [WfLane] with the given [id] and [elements], plus optional
+  /// [modifier].
   const WfLane({
     required this.id,
     required this.elements,
@@ -116,7 +118,7 @@ class WfLane with EquatableMixin implements FlowElement {
 ///   ReceiveOrder -> ProcessOrder -> ... -> OrderCompleted;
 /// }
 /// ```
-class WfProcess with EquatableMixin implements FlowElement {
+class WfProcess extends Equatable implements FlowElement {
   /// The process name (unique within its package).
   @override
   final NodeId id;
@@ -131,6 +133,8 @@ class WfProcess with EquatableMixin implements FlowElement {
   /// data objects, notifications, operations, sequence flows, subprocesses).
   final List<FlowElement> elements;
 
+  /// Creates a [WfProcess] with the given [id] and optional [modifier],
+  /// [ioRequirements] and [elements].
   const WfProcess({
     required this.id,
     this.modifier = WfModifier.none,
@@ -189,7 +193,7 @@ class WfProcess with EquatableMixin implements FlowElement {
 /// subsequent symbol-resolution pass links [WfDataObject] type references and
 /// [WfOperation] parameter names to the types imported from class diagram
 /// symbol tables.
-class WorkflowCompilationUnit with EquatableMixin {
+class WorkflowCompilationUnit extends Equatable {
   /// The optional package path, e.g. `de.monticore.bpmn.examples`.
   final PackagePath package;
 
@@ -199,6 +203,8 @@ class WorkflowCompilationUnit with EquatableMixin {
   /// The single process defined in this compilation unit.
   final WfProcess process;
 
+  /// Creates a [WorkflowCompilationUnit] wrapping [process], plus optional
+  /// [package] and [imports].
   const WorkflowCompilationUnit({
     required this.process,
     this.package = PackagePath.root,

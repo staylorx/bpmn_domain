@@ -36,6 +36,7 @@ sealed class EventTrigger {
 /// Context condition: cancel events may only appear *within* a
 /// `transaction` subprocess.
 final class CancelTrigger extends EventTrigger with EquatableMixin {
+  /// Creates a cancel trigger terminating the surrounding transaction.
   const CancelTrigger();
 
   @override
@@ -65,6 +66,7 @@ final class CompensateTrigger extends EventTrigger with EquatableMixin {
   /// Whether compensation is asynchronous.
   final bool async;
 
+  /// Creates a [CompensateTrigger] targeting [activity], optionally `async`.
   const CompensateTrigger({this.activity, this.async = false});
 
   @override
@@ -88,6 +90,7 @@ final class ConditionalTrigger extends EventTrigger with EquatableMixin {
   /// The raw condition expression, e.g. `stock.available > 0`.
   final String condition;
 
+  /// Creates a [ConditionalTrigger] that fires when [condition] is true.
   const ConditionalTrigger({required this.condition});
 
   @override
@@ -103,6 +106,7 @@ final class ConditionalTrigger extends EventTrigger with EquatableMixin {
 /// (including parallel branches and subprocesses).  It is only valid as an
 /// **end** event trigger.
 final class TerminateTrigger extends EventTrigger with EquatableMixin {
+  /// Creates a terminate trigger that ends the whole process.
   const TerminateTrigger();
 
   @override
@@ -128,6 +132,7 @@ final class TimerTrigger extends EventTrigger with EquatableMixin {
   /// The raw timer condition expression.
   final String condition;
 
+  /// Creates a [TimerTrigger] from the raw timer [condition] expression.
   const TimerTrigger({required this.condition});
 
   @override
@@ -155,6 +160,7 @@ final class NotificationTrigger extends EventTrigger with EquatableMixin {
   /// Name of the [WfNotification] symbol carrying the payload.
   final NodeId notificationName;
 
+  /// Creates a [NotificationTrigger] of [kind] targeting [notificationName].
   const NotificationTrigger({
     required this.kind,
     required this.notificationName,
@@ -203,6 +209,8 @@ final class MultipleTrigger extends EventTrigger with EquatableMixin {
   /// `true` → `all {…}` (all must occur);  `false` → `one {…}` (first wins).
   final bool parallel;
 
+  /// Creates a [MultipleTrigger] from the given [triggers]; when [parallel]
+  /// is true it becomes an `all {…}` trigger.
   const MultipleTrigger({required this.triggers, this.parallel = false});
 
   @override

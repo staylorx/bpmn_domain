@@ -49,6 +49,8 @@ final class WfStandardLoop extends LoopCharacteristic with EquatableMixin {
   /// Optional upper bound on iterations.
   final int? maxIterations;
 
+  /// Creates a [WfStandardLoop] with the given [isWhile] flag,
+  /// [loopCondition] and optional [maxIterations].
   const WfStandardLoop({
     required this.isWhile,
     required this.loopCondition,
@@ -56,20 +58,20 @@ final class WfStandardLoop extends LoopCharacteristic with EquatableMixin {
   });
 
   /// Creates a `while [condition]` loop.
-  factory WfStandardLoop.whileLoop(
-    String condition, {
-    int? max,
-  }) =>
+  factory WfStandardLoop.whileLoop(String condition, {int? max}) =>
       WfStandardLoop(
-          isWhile: true, loopCondition: condition, maxIterations: max);
+        isWhile: true,
+        loopCondition: condition,
+        maxIterations: max,
+      );
 
   /// Creates an `until [condition]` loop.
-  factory WfStandardLoop.untilLoop(
-    String condition, {
-    int? max,
-  }) =>
+  factory WfStandardLoop.untilLoop(String condition, {int? max}) =>
       WfStandardLoop(
-          isWhile: false, loopCondition: condition, maxIterations: max);
+        isWhile: false,
+        loopCondition: condition,
+        maxIterations: max,
+      );
 
   @override
   List<Object?> get props => [isWhile, loopCondition, maxIterations];
@@ -97,22 +99,29 @@ final class WfStandardLoop extends LoopCharacteristic with EquatableMixin {
 ///
 /// Exactly one of [literalCount], [expression], or [collectionName] is
 /// non-null.
-class WfLoopCardinality with EquatableMixin {
+class WfLoopCardinality extends Equatable {
+  /// The fixed literal count, or `null` if not a count cardinality.
   final int? literalCount;
+
+  /// A runtime expression computing the count, or `null`.
   final String? expression;
+
+  /// The name of the collection data object sized by the loop, or `null`.
   final String? collectionName;
 
+  /// Creates a [WfLoopCardinality] from exactly one of [literalCount],
+  /// [expression] or [collectionName].
   const WfLoopCardinality._({
     this.literalCount,
     this.expression,
     this.collectionName,
   }) : assert(
-          (literalCount != null ? 1 : 0) +
-                  (expression != null ? 1 : 0) +
-                  (collectionName != null ? 1 : 0) ==
-              1,
-          'Exactly one of literalCount, expression, or collectionName must be set',
-        );
+         (literalCount != null ? 1 : 0) +
+                 (expression != null ? 1 : 0) +
+                 (collectionName != null ? 1 : 0) ==
+             1,
+         'Exactly one of literalCount, expression, or collectionName must be set',
+       );
 
   /// Cardinality from a fixed integer.
   factory WfLoopCardinality.count(int n) =>
@@ -152,9 +161,24 @@ class WfLoopCardinality with EquatableMixin {
 /// | `first`    | Thrown only after the first instance completes     |
 /// | `all`      | Thrown once after all instances complete           |
 /// | (custom)   | [complexCondition] holds the custom expression     |
-enum MIEventTiming { none, first, all }
+/// When an implicit event is thrown relative to multi-instance completion.
+enum MIEventTiming {
+  /// Thrown after every instance completes (default).
+  none,
 
-class WfMIImplicitEventBehavior with EquatableMixin {
+  /// Thrown only after the first instance completes.
+  first,
+
+  /// Thrown once after all instances complete.
+  all,
+}
+
+/// Configuration for an implicit event thrown after each multi-instance
+/// loop completes.
+///
+/// Describes when the event trigger fires relative to instance completion,
+/// either via a standard [timing] or a custom [complexCondition].
+class WfMIImplicitEventBehavior extends Equatable {
   /// The event trigger to throw.  References an [EventTrigger] description.
   final String eventTriggerSource;
 
@@ -166,6 +190,8 @@ class WfMIImplicitEventBehavior with EquatableMixin {
   /// Mutually exclusive with [timing].
   final String? complexCondition;
 
+  /// Creates a [WfMIImplicitEventBehavior] from [eventTriggerSource], an
+  /// optional standard [timing] and optional [complexCondition].
   const WfMIImplicitEventBehavior({
     required this.eventTriggerSource,
     this.timing,
@@ -225,7 +251,10 @@ class WfMIImplicitEventBehavior with EquatableMixin {
 ///   until [approvalCount >= 3];
 /// ```
 final class WfMILoop extends LoopCharacteristic with EquatableMixin {
+  /// Determines how many instances the loop creates.
   final WfLoopCardinality cardinality;
+
+  /// `true` for parallel instances; `false` for sequential.
   final bool isParallel;
 
   /// Optional early-exit condition evaluated after each instance completes.
@@ -240,6 +269,9 @@ final class WfMILoop extends LoopCharacteristic with EquatableMixin {
   /// Optional implicit event behavior thrown after instance completion.
   final WfMIImplicitEventBehavior? implicitEventBehavior;
 
+  /// Creates a [WfMILoop] with the given [cardinality] and optional
+  /// [isParallel], [completionCondition], [loopDataInputs],
+  /// [loopDataOutputs] and [implicitEventBehavior].
   const WfMILoop({
     required this.cardinality,
     this.isParallel = true,
@@ -251,23 +283,21 @@ final class WfMILoop extends LoopCharacteristic with EquatableMixin {
 
   /// Creates a parallel multi-instance loop over a named collection.
   factory WfMILoop.parallelOver(String collectionName) => WfMILoop(
-        cardinality: WfLoopCardinality.collection(collectionName),
-        isParallel: true,
-      );
+    cardinality: WfLoopCardinality.collection(collectionName),
+    isParallel: true,
+  );
 
   /// Creates a sequential multi-instance loop with a literal count.
-  factory WfMILoop.sequential(int count) => WfMILoop(
-        cardinality: WfLoopCardinality.count(count),
-        isParallel: false,
-      );
+  factory WfMILoop.sequential(int count) =>
+      WfMILoop(cardinality: WfLoopCardinality.count(count), isParallel: false);
 
   @override
   List<Object?> get props => [
-        cardinality,
-        isParallel,
-        completionCondition,
-        loopDataInputs,
-        loopDataOutputs,
-        implicitEventBehavior,
-      ];
+    cardinality,
+    isParallel,
+    completionCondition,
+    loopDataInputs,
+    loopDataOutputs,
+    implicitEventBehavior,
+  ];
 }

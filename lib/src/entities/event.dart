@@ -79,13 +79,15 @@ enum EventDirection {
 ///
 /// Here [compensatedActivity] = `ProcessOrder` and
 /// [handlerActivity] = `RollbackOrderProcessing`.
-class CompensationHandler with EquatableMixin {
+class CompensationHandler extends Equatable {
   /// The activity whose effects should be undone.
   final NodeId compensatedActivity;
 
   /// The activity that performs the compensation.
   final NodeId handlerActivity;
 
+  /// Creates a [CompensationHandler] that undoes [compensatedActivity] by
+  /// running [handlerActivity].
   const CompensationHandler({
     required this.compensatedActivity,
     required this.handlerActivity,
@@ -149,7 +151,7 @@ class CompensationHandler with EquatableMixin {
 /// // Non-interrupting boundary escalation event
 /// event SLAWarning catch noninterrupt escalation SLABreach;
 /// ```
-class WfEvent with EquatableMixin implements FlowElement {
+class WfEvent extends Equatable implements FlowElement {
   /// The unique name of this event within its enclosing scope.
   @override
   final NodeId id;
@@ -186,6 +188,9 @@ class WfEvent with EquatableMixin implements FlowElement {
   /// Optional I/O data set associated with the event.
   final WfIOSet? ioSet;
 
+  /// Creates a [WfEvent] with the given [id] and [role], plus optional
+  /// [direction], [trigger], [modifier], [isBoundary], [nonInterrupt],
+  /// [compensationHandler], [operationRef] and [ioSet].
   const WfEvent({
     required this.id,
     required this.role,
@@ -203,51 +208,49 @@ class WfEvent with EquatableMixin implements FlowElement {
 
   /// A simple **none start** event (no trigger).
   factory WfEvent.start(String name) => WfEvent(
-        id: NodeId(name),
-        role: EventRole.start,
-        direction: EventDirection.catch_,
-      );
+    id: NodeId(name),
+    role: EventRole.start,
+    direction: EventDirection.catch_,
+  );
 
   /// A simple **none end** event (no trigger).
   factory WfEvent.end(String name) => WfEvent(
-        id: NodeId(name),
-        role: EventRole.end,
-        direction: EventDirection.throw_,
-      );
+    id: NodeId(name),
+    role: EventRole.end,
+    direction: EventDirection.throw_,
+  );
 
   /// A **terminate end** event that cancels all active branches.
   factory WfEvent.terminate(String name) => WfEvent(
-        id: NodeId(name),
-        role: EventRole.end,
-        direction: EventDirection.throw_,
-        trigger: const TerminateTrigger(),
-      );
+    id: NodeId(name),
+    role: EventRole.end,
+    direction: EventDirection.throw_,
+    trigger: const TerminateTrigger(),
+  );
 
   /// A simple **none intermediate** event (marker in the flow).
-  factory WfEvent.intermediate(String name) => WfEvent(
-        id: NodeId(name),
-        role: EventRole.intermediate,
-      );
+  factory WfEvent.intermediate(String name) =>
+      WfEvent(id: NodeId(name), role: EventRole.intermediate);
 
   /// A **message catch start** event — the process starts when a message
   /// arrives.
   factory WfEvent.messageCatchStart(String name, String messageName) => WfEvent(
-        id: NodeId(name),
-        role: EventRole.start,
-        direction: EventDirection.catch_,
-        trigger: NotificationTrigger(
-          kind: NotificationKind.message,
-          notificationName: NodeId(messageName),
-        ),
-      );
+    id: NodeId(name),
+    role: EventRole.start,
+    direction: EventDirection.catch_,
+    trigger: NotificationTrigger(
+      kind: NotificationKind.message,
+      notificationName: NodeId(messageName),
+    ),
+  );
 
   /// A **timer intermediate catch** event.
   factory WfEvent.timerCatch(String name, String timerCondition) => WfEvent(
-        id: NodeId(name),
-        role: EventRole.intermediate,
-        direction: EventDirection.catch_,
-        trigger: TimerTrigger(condition: timerCondition),
-      );
+    id: NodeId(name),
+    role: EventRole.intermediate,
+    direction: EventDirection.catch_,
+    trigger: TimerTrigger(condition: timerCondition),
+  );
 
   /// A **compensation boundary** event attached to an activity.
   factory WfEvent.compensationBoundary({
@@ -255,30 +258,29 @@ class WfEvent with EquatableMixin implements FlowElement {
     required String compensatedActivity,
     required String handlerActivity,
     bool nonInterrupt = false,
-  }) =>
-      WfEvent(
-        id: NodeId(name),
-        role: EventRole.intermediate,
-        direction: EventDirection.catch_,
-        isBoundary: true,
-        nonInterrupt: nonInterrupt,
-        compensationHandler: CompensationHandler(
-          compensatedActivity: NodeId(compensatedActivity),
-          handlerActivity: NodeId(handlerActivity),
-        ),
-        trigger: CompensateTrigger(activity: NodeId(compensatedActivity)),
-      );
+  }) => WfEvent(
+    id: NodeId(name),
+    role: EventRole.intermediate,
+    direction: EventDirection.catch_,
+    isBoundary: true,
+    nonInterrupt: nonInterrupt,
+    compensationHandler: CompensationHandler(
+      compensatedActivity: NodeId(compensatedActivity),
+      handlerActivity: NodeId(handlerActivity),
+    ),
+    trigger: CompensateTrigger(activity: NodeId(compensatedActivity)),
+  );
 
   /// An **error end** event that throws a named error.
   factory WfEvent.errorEnd(String name, String errorName) => WfEvent(
-        id: NodeId(name),
-        role: EventRole.end,
-        direction: EventDirection.throw_,
-        trigger: NotificationTrigger(
-          kind: NotificationKind.error,
-          notificationName: NodeId(errorName),
-        ),
-      );
+    id: NodeId(name),
+    role: EventRole.end,
+    direction: EventDirection.throw_,
+    trigger: NotificationTrigger(
+      kind: NotificationKind.error,
+      notificationName: NodeId(errorName),
+    ),
+  );
 
   // Derived properties ---------------------------------------------------------
 
@@ -304,15 +306,15 @@ class WfEvent with EquatableMixin implements FlowElement {
 
   @override
   List<Object?> get props => [
-        id,
-        role,
-        direction,
-        trigger,
-        modifier,
-        isBoundary,
-        nonInterrupt,
-        compensationHandler,
-        operationRef,
-        ioSet,
-      ];
+    id,
+    role,
+    direction,
+    trigger,
+    modifier,
+    isBoundary,
+    nonInterrupt,
+    compensationHandler,
+    operationRef,
+    ioSet,
+  ];
 }

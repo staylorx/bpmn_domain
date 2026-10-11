@@ -83,7 +83,7 @@ enum DataKind {
 /// ```
 /// This indicates the manual worker needs access to both `order` (a data
 /// object) and `products` (a data store) to perform the task.
-class WfDataObject with EquatableMixin implements FlowElement {
+class WfDataObject extends Equatable implements FlowElement {
   /// The unique name of this data object within its enclosing scope.
   @override
   final NodeId id;
@@ -95,6 +95,7 @@ class WfDataObject with EquatableMixin implements FlowElement {
   /// (either a built-in or an imported class-diagram type).
   final WfTypeRef type;
 
+  /// Creates a [WfDataObject] with the given [id], [kind] and [type].
   const WfDataObject({
     required this.id,
     required this.kind,
@@ -103,17 +104,17 @@ class WfDataObject with EquatableMixin implements FlowElement {
 
   /// Creates a transient data object declaration.
   factory WfDataObject.data(String name, String typeName) => WfDataObject(
-        id: NodeId(name),
-        kind: DataKind.dataObject,
-        type: WfTypeRef.named(typeName),
-      );
+    id: NodeId(name),
+    kind: DataKind.dataObject,
+    type: WfTypeRef.named(typeName),
+  );
 
   /// Creates a data store declaration.
   factory WfDataObject.store(String name, String typeName) => WfDataObject(
-        id: NodeId(name),
-        kind: DataKind.dataStore,
-        type: WfTypeRef.named(typeName),
-      );
+    id: NodeId(name),
+    kind: DataKind.dataStore,
+    type: WfTypeRef.named(typeName),
+  );
 
   /// `true` when this is a transient data object.
   bool get isDataObject => kind == DataKind.dataObject;
