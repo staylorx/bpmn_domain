@@ -11,9 +11,12 @@ analyzer:
     strict-casts: true
     strict-raw-types: true
 
+  # Bible §2.2: no config-level suppressions. dead_code (and all other
+  # diagnostics) run at their default severity; genuine dead code is
+  # removed, never downgraded. todo is an error so TODOs can't survive.
   errors:
     missing_return: error
-    dead_code: info
+    todo: error
 
 linter:
   rules:
