@@ -6,9 +6,6 @@ analyzer:
 
   exclude:
     - build/**
-    # - bin/**
-    # - test/**
-    # - tools/**
 
   language:
     strict-casts: true
