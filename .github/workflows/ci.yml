@@ -15,9 +15,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Lower floor == the exercised version == what the lockfile resolves to.
-        # Pin both here so CI is deterministic ("lock pinning").
-        sdk: [3.13.1]
+        # Multi-SDK floor (bible §9 step 10): exercise the declared minimum
+        # SDK (3.10.0) AND latest stable so the floor is actually held and
+        # forward drift is caught. Both rows must pass analyze/format/test.
+        sdk: [3.10.0, stable]
     steps:
       - uses: actions/checkout@v4
 
