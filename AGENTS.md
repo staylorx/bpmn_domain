@@ -9,20 +9,20 @@ This file records the repo's local wiring, its deviations from the Dart/Flutter 
 ### Tooling
 
 - Dart SDK via FVM default (`C:/Users/stayl/fvm/default/bin`). CI targets a multi-SDK floor: `[3.10.0, stable]` (declared floor `>=3.10.0 <4.0.0` plus latest stable to catch forward drift).
-- `dart pub get` — resolve dependencies. Declared `fpdart` `^1.2.0`; see the deviation note below (currently unused).
+- **Melos** is the workspace + task runner (Topology C, single-package; `useRootAsPackage: true`). All local tasks go through it: `melos bs` (bootstrap / dependency resolve) and `melos run <task>`. Melos is pinned `^8.8.0` in `dev_dependencies`.
+- `dart pub get` — resolve dependencies directly (the single-package equivalent of `melos bs`). Declared `fpdart` `^1.2.0`; see the deviation note below (currently unused).
 
 ### Gate
 
-CI (`./.github/workflows/ci.yml`) runs on push to `main` and on PRs. Local equivalent, must be green before committing/pushing:
+CI (`./.github/workflows/ci.yml`) runs on push to `main` and on PRs. Local equivalent, must be green before committing/pushing (also reachable in one shot via `melos run verify`, which runs analyze → format → test):
 
 ```sh
-dart pub get
-dart analyze --fatal-infos --fatal-warnings   # → "No issues found!" (zero diagnostics of any severity)
-dart format --output=none --set-exit-if-changed .
-dart test                                     # → 124 tests
+melos run analyze     # dart analyze --fatal-infos --fatal-warnings → "No issues found!"
+melos run format      # dart format --output=none --set-exit-if-changed . → no diffs
+melos run test        # dart test → 124 tests
 ```
 
-> Note (doctrine gate, see deviations): `dart analyze --fatal-infos --fatal-warnings` is currently RED on `main` — 61 × `deprecated_member_use` from `EquatableMixin` being deprecated in `equatable` 2.1.0 (fix: `extends Equatable` / `with EquatableMixin` → `with Equatable`). Until fixed, the repo cannot pass its own gate. Verified locally on `main` @ `c44dbff`.
+`melos run clean:deep` is available for a nuclear reset (git clean of all untracked files, then `melos bs` re-bootstrap). It only ever removes untracked artifacts (`.dart_tool/`, `doc/` dartdoc output, IDE noise) — tracked `docs/`, `lib/`, `test/`, `pubspec.yaml`, `pubspec.lock`, `analysis_options.yaml` are always safe.
 
 ### Key paths
 
@@ -61,9 +61,9 @@ Each item is a place this repo differs from the bible where the difference is de
 
 7. **`EquatableMixin` (deprecated form).** Code uses `with EquatableMixin`, which `equatable` 2.1.0 deprecates in favour of `with Equatable`. Same root cause as the red analyze gate; listed as a doctrine-shape call.
 
-8. **No `dart_arch_test` boundary test.** §2/§9.7 make package-boundary direction + cycle-freedom a CI hard gate. With a single package there is no cross-package direction to check today (harmless now), but this repo is one third of a core+adapters split the bible's §3 Topology B only half-sanctions; the boundary test is what would catch the split going wrong. Flagged for the workspace-level decision.
+8. **No `dart_arch_test` boundary test.** §2/§9.7 make package-boundary direction + cycle-freedom a CI hard gate. With a single package there is no cross-package direction to check today (harmless now), but this repo is one third of a core+adapters split the bible's §3 Topology B only half-sanctions; the boundary test is what would catch the split going wrong. Flagged for the workspace-level decision. (The former TODO comment in `test/bpmn_domain_test.dart` was removed so the `todo: error` analyze gate stays green; this deviation entry is the permanent record.)
 
-9. **No root `workspace:` — standalone single package, consumed as a git dependency.** The bible's workspace model (§2/§9.2-4) assumes a root pubspec with a `workspace:` list; this repo is standalone and siblings consume it as an (unpinned `ref:`) git dependency — the failure mode the workspace model exists to prevent. Deliberate topology choice.
+9. **Single-package melos workspace (Topology C, `useRootAsPackage: true`), consumed as a git dependency.** The bible's workspace model (§2/§9.2-4) assumes a root pubspec with a `workspace:` list of sub-packages; this repo instead is a Topology-C melos workspace where the root pubspec IS the only package (`useRootAsPackage: true`, no `workspace:` list). Siblings consume it as an (unpinned `ref:`) git dependency — the failure mode the workspace model exists to prevent. Deliberate topology choice.
 
 10. **README trimmed to orientation-only (`publish_to: none`).** **RESOLVED** via ADR-0002 — because the package sets `publish_to: none` there is no pub.dev consumer surface for the README to "seam" for, so the §4 seam argument collapses.
 
