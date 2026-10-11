@@ -30,13 +30,15 @@ Problems found:
   is live, not theoretical. Until this is fixed the repo cannot pass its own
   doctrine gate; nothing else about the package is red.
 
-- **Three declared-but-unused dependencies.** `fpdart` (`dependencies`) and
-  `shouldly` + `mocktail` (`dev_dependencies`) are imported nowhere in `lib/` or
-  `test/` (verified by grep). `fpdart`'s only appearance is a doc-comment
-  reference in `workflow_failure.dart:15`. **Recommendation: either bring the
-  tests onto `shouldly` and use `fpdart` at the (future) seam, or drop all three
-  — a dependency that is declared and unused is a false signal.** (`shouldly` was
-  added in `c44dbff` for exactly the testing-doctrine reason below.)
+- **Two declared-but-unused dependencies.** `fpdart` (`dependencies`) and
+  `mocktail` (`dev_dependencies`) are imported nowhere in `lib/` or `test/`
+  (verified by grep). `fpdart`'s only appearance is a doc-comment reference in
+  `workflow_failure.dart:15`. **Recommendation: either use `fpdart` at the
+  (future) seam, or drop it — a dependency that is declared and unused is a
+  false signal.** (`shouldly`, previously listed here as unused, is now
+  **CONVERTED** — the tests were migrated onto it in `297b61a` and its
+  dev-dependency is retained at `^0.5.0+1`. Decision and rationale in
+  `bpmn-shouldly-decision.md`.)
 
 - **`CHANGELOG.md` version ≠ `pubspec.yaml` version.** `pubspec.yaml` declares
   `version: 0.1.0` while the changelog's only heading is `## 1.0.0`.
@@ -106,13 +108,14 @@ do not auto-fix. Line references are to `main` @ `c44dbff`.
   rationale; the unsealed non-family multi-class files are NOT covered by this
   sanction and remain one-class-per-file candidates.
 
-- Deviation: `test/bpmn_domain_test.dart` (the sole test file) - **every test
-  uses `expect()` from `package:test`; no test imports `shouldly`.** §6: shouldly
-  is the assertion library (`value.should.be(...)`) and `expect()` is never mixed
-  in. Compounding it, the test names are **not Given/When/Then** — they are
-  behaviour labels (`'equality is structural'`, `'isSimpleName rejects qualified
-  names'`, `'ProcessNotSound message'`), where §6 gives the
-  `Given … / When … / Then …` group shape. Both are mechanical migrations; the
+- Deviation: `test/bpmn_domain_test.dart` (the sole test file) - **assertion
+  style: CONVERTED.** All assertions now use `shouldly` (`value.should.be(...)`)
+  per §6 — converted in `297b61a` (213 `should.` calls, no `expect(` mixing;
+  decision in `bpmn-shouldly-decision.md`). **Recorded deviation (remaining):
+  the test names are not Given/When/Then** — they are behaviour labels
+  (`'equality is structural'`, `'isSimpleName rejects qualified names'`,
+  `'ProcessNotSound message'`), where §6 gives the
+  `Given … / When … / Then …` group shape. A mechanical migration; the
   domain-layer matrix row (unit tests, no mocks) is otherwise correct.
 
 - Deviation: (missing) an error-style declaration - **no package declares
