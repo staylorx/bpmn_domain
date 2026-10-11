@@ -237,6 +237,31 @@ do not auto-fix. Line references are to `main` @ `c44dbff`.
   sequencing")** — currently sequencing the use-case/validator seam into
   `bpmn_application`, which is where this deviation gets revisited.
 
+- Deviation: `lib/` (no use-case layer, `I*Repository` contracts, datasource
+  packages, or `IUnitOfWork` in this package) - **sequencing DECIDED
+  (CONFIRM).** The bible §1/§3/§5 build the bulls-eye out to use cases and
+  adapters from day one, but on-disk verification shows that layering *already
+  exists group-wide*: `bpmn_application` holds the 7 use cases and the
+  `WorkflowRepository`/`ClassDiagramRepository` contracts, and
+  `bpmn_infrastructure` is a melos workspace with 2 datasource adapters
+  (parser/file + sembast) — so the ≥2-adapter rule (§5) and the use-case layer
+  (§3) are already satisfied outside this pure-domain package (sanctioned
+  topology, see the standalone deviation above). **Decision (t_d82e5f3d /
+  t_eda54b2f): CONFIRM the existing layering and the `Either` seam now — no
+  new work, no churn.** The intended use-case seam is
+  `Either<List<WorkflowFailure>, WfProcess>`, already committed behind
+  `ValidateWorkflowUseCase` (its CoCo checker bodies deliberately stubbed
+  pending the parser). **Deferred, with explicit triggers:**
+  - *Checker/resolver/conformance bodies* (**T1**): begin implementing behind
+    the committed seam when the `.wfm` parser is underway and can emit a real
+    `WfProcess`/`WorkflowCompilationUnit` graph.
+  - *IUnitOfWork* (§5.5, optional) (**T2**): introduce when the first
+    transactional/atomic multi-store write requirement lands, or a 3rd
+    datasource adapter is added.
+  **REVISIT TRIGGER: revisit when `I*Repository` contracts or a use case are
+  declared *in this package* or a workspace member** — which also flips the
+  standalone-topology revisit trigger above.
+
 ## Open questions
 
 - **Do the long-form class docs stay?** Enabling `public_member_api_docs`
