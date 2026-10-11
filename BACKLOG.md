@@ -152,6 +152,20 @@ do not auto-fix. Line references are to `main` @ `c44dbff`.
   doctrine, not an orientation. Flagged for review: for a domain-model package
   the entity catalogue may legitimately be the orientation, but it currently
   restates §1/§4 rules verbatim ("no parsing, no I/O").
+  **STATUS: RESOLVED — TRIM the README to orientation-only.** Because the
+  package sets `publish_to: none`, no pub.dev consumer surface exists for the
+  README to "seam" for, so the public-facing seam counter-argument collapses;
+  the sanctioned §4 error-style declaration (already added to the barrel doc
+  comment) carries the honest seam. Planned changes (see the decision document
+  `docs/adr/0002-readme-orientation-only.md`, task `t_bee74f83`; source
+  `README-decision-final.md`): keep the title + one-paragraph
+  intro, the §4 seam declaration, getting-started/tests, and an optional 5-line
+  `lib/` layout sketch; move the roadmap `Either<...>` snippets and the 5-layer
+  roadmap to `docs/roadmap.md` (or delete — the API is unimplemented); move
+  illustrative `dart`/DSL blocks to tests (no `examples/`, given `publish_to:
+  none`); replace the dependency table with a one-line pointer to
+  `DEPENDENCY_DECISIONS.md`; drop or relocate the architecture diagram/package
+  tree to `docs/adr/`; and fix the markdown corruption regardless.
 
 - Deviation: (missing) a `dart_arch_test` boundary test - **no architecture test
   exists and `dart_arch_test` appears in no pubspec.** §2/§9.7 make package-boundary
