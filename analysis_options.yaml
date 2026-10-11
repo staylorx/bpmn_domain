@@ -15,8 +15,6 @@ analyzer:
     strict-raw-types: true
 
   errors:
-    # todo: ignore
-    invalid_assignment: warning
     missing_return: error
     dead_code: info
 
