@@ -2,6 +2,10 @@
 
 A clean-architecture domain model influenced from the MontiCore **Workflow DSL** (`.wfm`) and **CD4Analysis Class Diagram** (`.cd`) languages. Provides richly documented, immutable domain entities ready to be consumed by a parser, validator, and conformance-checker layer above.
 
+## Error style
+
+This package throws nothing and returns no plain-error tuples: every public seam presents FP-style tuples as `Future<Either<WorkflowFailure, T>>` (no `TaskEither` handed un-run, no exception raised across a seam). Failures are the sealed `WorkflowFailure` hierarchy.
+
 ---
 
 ## Table of Contents
