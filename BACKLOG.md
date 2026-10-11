@@ -74,12 +74,6 @@ Repo `staylorx/dart-flutter-bible`, `docs/` §1–§12. Each item is a place the
 differs from the bible **where the bible itself may be wrong** — flag for review,
 do not auto-fix. Line references are to `main` @ `c44dbff`.
 
-- Deviation: `pubspec.yaml:10` - the SDK constraint is `">=3.0.0 <4.0.0"`. §2
-  pins `'>=3.10.0 <4.0.0'` (floor 3.10) in **every** pubspec. Flagged rather than
-  changed: nothing in this package needs 3.10 (it compiles on 3.0), so lowering
-  the floor may be a deliberate compatibility choice the bible does not
-  contemplate — but as written it fails the §9 bootstrap checklist.
-
 - Deviation: `analysis_options.yaml` - `public_member_api_docs` is **not
   enabled**, and `todo: error` is not mapped (§2/§9.8). The consequence is
   measurable: re-running `dart analyze` in a scratch copy with the bible's lints

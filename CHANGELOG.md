@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `pubspec.yaml` — raised `environment.sdk` floor from `>=3.0.0` to `>=3.13.1`
+  (`<4.0.0` upper bound unchanged). The 3.0.0 floor was untested: every green
+  gate ran on the locally exercised Dart 3.13.1, and the resolved lockfile
+  already legislates `>=3.9.0`. Verified on 3.13.1 after the change: `dart pub
+  get` clean, `dart analyze` no issues, `dart test` 124/124 passed. (Formerly a
+  `BACKLOG.md` SDK-deviation item, now removed from there.)
 - `CHANGELOG.md` reformatted to Keep a Changelog: added the file preamble, the
   `[Unreleased]` section, and `Added`/`Changed`/`Fixed`/`Notes` headings.
 - `CHANGELOG.md`: the release heading was **corrected from `1.0.0` to `0.1.0`**
