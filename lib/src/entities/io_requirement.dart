@@ -119,7 +119,7 @@ sealed class WfIORequirement {
 /// out report:PDF;
 /// in { items[i]:Product, config:Settings };
 /// ```
-final class WfIOSet extends WfIORequirement with EquatableMixin {
+final class WfIOSet extends WfIORequirement with Equatable {
   /// `true` = input, `false` = output.
   final bool isInput;
 
@@ -163,7 +163,7 @@ final class WfIOSet extends WfIORequirement with EquatableMixin {
 ///
 /// I/O rules allow a process or task to declare precise data-flow
 /// transformations rather than simply listing inputs and outputs separately.
-final class WfIORule extends WfIORequirement with EquatableMixin {
+final class WfIORule extends WfIORequirement with Equatable {
   /// The data set consumed on the input side of the rule.
   final WfDataSet inputSet;
 

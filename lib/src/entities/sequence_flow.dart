@@ -31,7 +31,7 @@ sealed class FlowCondition {
 }
 
 /// An expression-based guard on a sequence flow edge.
-final class ExpressionCondition extends FlowCondition with EquatableMixin {
+final class ExpressionCondition extends FlowCondition with Equatable {
   /// The raw boolean expression from the source, e.g. `checker.allProductsAvailable`.
   final String expression;
 
@@ -47,7 +47,7 @@ final class ExpressionCondition extends FlowCondition with EquatableMixin {
 
 /// The default branch — taken when no [ExpressionCondition] on a sibling
 /// branch evaluates to `true`.  Written as `[_]` in the DSL.
-final class DefaultCondition extends FlowCondition with EquatableMixin {
+final class DefaultCondition extends FlowCondition with Equatable {
   /// Creates the default (`[_]`) branch condition.
   const DefaultCondition();
 

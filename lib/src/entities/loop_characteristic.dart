@@ -39,7 +39,7 @@ sealed class LoopCharacteristic {
 /// task Retry while [retries < 3] max 5;
 /// task AttemptDelivery until [delivered == true];
 /// ```
-final class WfStandardLoop extends LoopCharacteristic with EquatableMixin {
+final class WfStandardLoop extends LoopCharacteristic with Equatable {
   /// Whether this is a `while` loop (`true`) or an `until` loop (`false`).
   final bool isWhile;
 
@@ -250,7 +250,7 @@ class WfMIImplicitEventBehavior extends Equatable {
 ///   count 5 parallel
 ///   until [approvalCount >= 3];
 /// ```
-final class WfMILoop extends LoopCharacteristic with EquatableMixin {
+final class WfMILoop extends LoopCharacteristic with Equatable {
   /// Determines how many instances the loop creates.
   final WfLoopCardinality cardinality;
 

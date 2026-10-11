@@ -35,7 +35,7 @@ sealed class EventTrigger {
 ///
 /// Context condition: cancel events may only appear *within* a
 /// `transaction` subprocess.
-final class CancelTrigger extends EventTrigger with EquatableMixin {
+final class CancelTrigger extends EventTrigger with Equatable {
   /// Creates a cancel trigger terminating the surrounding transaction.
   const CancelTrigger();
 
@@ -58,7 +58,7 @@ final class CancelTrigger extends EventTrigger with EquatableMixin {
 /// event PossibleCancellation
 ///   catch compensate ProcessOrder with RollbackOrderProcessing;
 /// ```
-final class CompensateTrigger extends EventTrigger with EquatableMixin {
+final class CompensateTrigger extends EventTrigger with Equatable {
   /// The name of the activity to compensate (may be `null` for implicit
   /// self-compensation on a boundary event).
   final NodeId? activity;
@@ -86,7 +86,7 @@ final class CompensateTrigger extends EventTrigger with EquatableMixin {
 /// ```
 /// event InventoryRestocked catch when [stock.available > 0];
 /// ```
-final class ConditionalTrigger extends EventTrigger with EquatableMixin {
+final class ConditionalTrigger extends EventTrigger with Equatable {
   /// The raw condition expression, e.g. `stock.available > 0`.
   final String condition;
 
@@ -105,7 +105,7 @@ final class ConditionalTrigger extends EventTrigger with EquatableMixin {
 /// A **terminate end event** cancels all active tokens in the process
 /// (including parallel branches and subprocesses).  It is only valid as an
 /// **end** event trigger.
-final class TerminateTrigger extends EventTrigger with EquatableMixin {
+final class TerminateTrigger extends EventTrigger with Equatable {
   /// Creates a terminate trigger that ends the whole process.
   const TerminateTrigger();
 
@@ -128,7 +128,7 @@ final class TerminateTrigger extends EventTrigger with EquatableMixin {
 /// event DeadlineReached catch timer [on 2025-12-31];
 /// event ProcessTimeout catch timer [after PT4H];   // ISO 8601 duration
 /// ```
-final class TimerTrigger extends EventTrigger with EquatableMixin {
+final class TimerTrigger extends EventTrigger with Equatable {
   /// The raw timer condition expression.
   final String condition;
 
@@ -153,7 +153,7 @@ final class TimerTrigger extends EventTrigger with EquatableMixin {
 /// - **escalation** — non-fatal escalation to a higher-level process
 ///
 /// The [notificationName] references a `WFNotification` symbol in scope.
-final class NotificationTrigger extends EventTrigger with EquatableMixin {
+final class NotificationTrigger extends EventTrigger with Equatable {
   /// The type of notification.
   final NotificationKind kind;
 
@@ -202,7 +202,7 @@ enum NotificationKind {
 /// ```
 /// event PaymentOrTimeout catch one { message PaymentReceived, timer [after PT30M] };
 /// ```
-final class MultipleTrigger extends EventTrigger with EquatableMixin {
+final class MultipleTrigger extends EventTrigger with Equatable {
   /// The list of sub-triggers.
   final List<EventTrigger> triggers;
 

@@ -98,7 +98,7 @@ class CalendarDate extends Equatable {
 /// ```
 /// event DailyStandup catch timer [at 09:00];
 /// ```
-final class AtTimerCondition extends TimerCondition with EquatableMixin {
+final class AtTimerCondition extends TimerCondition with Equatable {
   /// The wall-clock [TimeOfDay] at which the event fires.
   final TimeOfDay time;
 
@@ -126,7 +126,7 @@ final class AtTimerCondition extends TimerCondition with EquatableMixin {
 /// event ProjectDeadline catch timer [on 2026-06-30 at 17:00];
 /// event NewYearStart    catch timer [on 2027-01-01];
 /// ```
-final class OnDateTimerCondition extends TimerCondition with EquatableMixin {
+final class OnDateTimerCondition extends TimerCondition with Equatable {
   /// The [CalendarDate] on which the event fires.
   final CalendarDate date;
 
@@ -160,7 +160,7 @@ final class OnDateTimerCondition extends TimerCondition with EquatableMixin {
 /// event ProcessTimeout catch timer [after PT4H];
 /// event PaymentWindowExpired catch timer [after PT30M];
 /// ```
-final class AfterPeriodCondition extends TimerCondition with EquatableMixin {
+final class AfterPeriodCondition extends TimerCondition with Equatable {
   /// ISO 8601 duration string, e.g. `PT4H`, `P2D`.
   final String period;
 
@@ -188,7 +188,7 @@ final class AfterPeriodCondition extends TimerCondition with EquatableMixin {
 /// event WeeklyReport catch timer [every P1W];
 /// event HourlyCheck  catch timer [start on 2026-03-01, 24 times every PT1H];
 /// ```
-final class EveryTimeCondition extends TimerCondition with EquatableMixin {
+final class EveryTimeCondition extends TimerCondition with Equatable {
   /// Optional start date/time after which the first trigger fires.
   final OnDateTimerCondition? startDate;
 
@@ -229,7 +229,7 @@ final class EveryTimeCondition extends TimerCondition with EquatableMixin {
 /// event BusinessHoursOpen catch timer [cron "0 9 * * MON-FRI"];
 /// event MidnightBatch     catch timer [cron "0 0 * * *"];
 /// ```
-final class CronTimerCondition extends TimerCondition with EquatableMixin {
+final class CronTimerCondition extends TimerCondition with Equatable {
   /// The raw cron expression string.
   final String value;
 
