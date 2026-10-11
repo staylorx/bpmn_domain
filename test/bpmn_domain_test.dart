@@ -134,10 +134,10 @@ void main() {
     });
 
     test('complex gateway carries guard expression', () {
-      final g = WfGateway(
-        id: const NodeId('VoteDecision'),
+      final g = const WfGateway(
+        id: NodeId('VoteDecision'),
         direction: GatewayDirection.split,
-        kind: const ComplexGateway(guard: 'majority(votes) > 0.5'),
+        kind: ComplexGateway(guard: 'majority(votes) > 0.5'),
       );
       expect((g.kind as ComplexGateway).guard, 'majority(votes) > 0.5');
     });
@@ -167,7 +167,7 @@ void main() {
     });
 
     test('CompensateTrigger with activity', () {
-      final t = CompensateTrigger(activity: const NodeId('ProcessOrder'));
+      final t = const CompensateTrigger(activity: NodeId('ProcessOrder'));
       expect(t.toString(), 'compensate ProcessOrder');
     });
 
@@ -191,24 +191,24 @@ void main() {
     });
 
     test('NotificationTrigger message', () {
-      final t = NotificationTrigger(
+      final t = const NotificationTrigger(
         kind: NotificationKind.message,
-        notificationName: const NodeId('cancelMsg'),
+        notificationName: NodeId('cancelMsg'),
       );
       expect(t.toString(), 'message cancelMsg');
     });
 
     test('MultipleTrigger one', () {
-      final t = MultipleTrigger(
-        triggers: [const CancelTrigger(), const TerminateTrigger()],
+      final t = const MultipleTrigger(
+        triggers: [CancelTrigger(), TerminateTrigger()],
         parallel: false,
       );
       expect(t.toString(), 'one { cancel, terminate }');
     });
 
     test('MultipleTrigger all is parallel', () {
-      final t = MultipleTrigger(
-        triggers: [const CancelTrigger()],
+      final t = const MultipleTrigger(
+        triggers: [CancelTrigger()],
         parallel: true,
       );
       expect(t.toString(), 'all { cancel }');
@@ -447,7 +447,7 @@ void main() {
       final rule = WfIORule(
         inputSet: WfDataSet.single(WfDataIO(
             name: const NodeId('order'), type: WfTypeRef.named('Order'))),
-        outputSet: WfDataSet.single(WfDataIO(name: const NodeId('invoice'))),
+        outputSet: WfDataSet.single(const WfDataIO(name: NodeId('invoice'))),
       );
       expect(rule.inputSet.items.first.name.value, 'order');
       expect(rule.outputSet.items.first.name.value, 'invoice');
@@ -462,8 +462,8 @@ void main() {
     });
 
     test('WfDataIO optional and whileExecuting', () {
-      final d = WfDataIO(
-          name: const NodeId('config'), optional: true, whileExecuting: true);
+      final d = const WfDataIO(
+          name: NodeId('config'), optional: true, whileExecuting: true);
       expect(d.optional, isTrue);
       expect(d.whileExecuting, isTrue);
     });
@@ -527,11 +527,11 @@ void main() {
     });
 
     test('operation with thrown errors', () {
-      final op = WfOperation(
-        id: const NodeId('authorisePayment'),
-        inParam: const NodeId('paymentRequest'),
-        outParam: const NodeId('captureConfirmation'),
-        thrownErrors: [const NodeId('CardDeclinedError')],
+      final op = const WfOperation(
+        id: NodeId('authorisePayment'),
+        inParam: NodeId('paymentRequest'),
+        outParam: NodeId('captureConfirmation'),
+        thrownErrors: [NodeId('CardDeclinedError')],
       );
       expect(op.canThrowErrors, isTrue);
       expect(op.thrownErrors.first.value, 'CardDeclinedError');
@@ -682,24 +682,24 @@ void main() {
     test('fully qualified name with package', () {
       final cu = WorkflowCompilationUnit(
         package: PackagePath.parse('de.monticore.bpmn.examples'),
-        process: WfProcess(id: const NodeId('OrderToDeliveryWorkflow')),
+        process: const WfProcess(id: NodeId('OrderToDeliveryWorkflow')),
       );
       expect(cu.fullyQualifiedName,
           'de.monticore.bpmn.examples.OrderToDeliveryWorkflow');
     });
 
     test('fully qualified name without package', () {
-      final cu = WorkflowCompilationUnit(
-        process: WfProcess(id: const NodeId('Simple')),
+      final cu = const WorkflowCompilationUnit(
+        process: WfProcess(id: NodeId('Simple')),
       );
       expect(cu.fullyQualifiedName, 'Simple');
     });
 
     test('imports are stored', () {
-      final cu = WorkflowCompilationUnit(
-        process: WfProcess(id: const NodeId('P')),
+      final cu = const WorkflowCompilationUnit(
+        process: WfProcess(id: NodeId('P')),
         imports: [
-          const ImportStatement(
+          ImportStatement(
               path: 'de.monticore.bpmn.cds.OrderToDelivery', wildcard: true)
         ],
       );
@@ -735,12 +735,12 @@ void main() {
 
   group('CdMethod', () {
     test('public method signature', () {
-      final m = CdMethod(
+      final m = const CdMethod(
         name: 'checkAvailability',
         returnType: 'boolean',
         parameters: [
-          const CdMethodParameter(name: 'productID', type: 'String'),
-          const CdMethodParameter(name: 'qty', type: 'int'),
+          CdMethodParameter(name: 'productID', type: 'String'),
+          CdMethodParameter(name: 'qty', type: 'int'),
         ],
         visibility: CdVisibility.public,
       );
@@ -816,10 +816,10 @@ void main() {
 
   group('CdInterface', () {
     test('interface with methods', () {
-      final iface = CdInterface(
+      final iface = const CdInterface(
         name: 'Trackable',
         methods: [
-          const CdMethod(
+          CdMethod(
               name: 'getTrackingNumber',
               returnType: 'String',
               visibility: CdVisibility.public),

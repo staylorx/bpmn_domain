@@ -19,7 +19,6 @@ analyzer:
     invalid_assignment: warning
     missing_return: error
     dead_code: info
-    prefer_const_constructors: ignore
 
 linter:
   rules:
