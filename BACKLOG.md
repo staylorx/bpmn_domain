@@ -79,15 +79,6 @@ do not auto-fix. Line references are to `main` @ `c44dbff`.
   and these run to dozens. Flagged for review — the long-form docs are genuinely
   useful and a stricter lint would force them to shrink.
 
-- Deviation: `analysis_options.yaml:17-22` - the `errors:` block **downgrades**
-  `invalid_assignment` to `warning` and `dead_code` to `info`, **disables**
-  `prefer_const_constructors`, and carries a `# todo: ignore` comment where
-  `todo: error` belongs. §2 says never disable or downgrade a rule in
-  `analysis_options.yaml` (and §2's "zero diagnostics of any severity" makes the
-  downgrade meaningless anyway — an info still fails `--fatal-infos`). Note the
-  `prefer_const_constructors` rule is *also* listed under `linter: rules:`, so the
-  file both enables and ignores it in two places.
-
 - Deviation: `lib/src/entities/**`, `lib/src/value_objects/**`, `lib/src/cd/**`,
   `lib/src/failures/workflow_failure.dart` - **one class per file is violated
   throughout.** 20 of the 27 `lib/src/**` files declare more than one public
