@@ -8,13 +8,13 @@ This file records the repo's local wiring, its deviations from the Dart/Flutter 
 
 ### Tooling
 
-- Dart SDK via FVM default (`C:/Users/stayl/fvm/default/bin`). CI targets a multi-SDK floor: `[3.10.0, stable]` (declared floor `>=3.10.0 <4.0.0` plus latest stable to catch forward drift).
+- Dart SDK via FVM default (`C:/Users/stayl/fvm/default/bin`). The gate targets the declared floor `>=3.10.0 <4.0.0`; test `[3.10.0, stable]` when you can — with no hosted CI nothing checks the floor for you.
 - **Melos** is the workspace + task runner (Topology C, single-package; `useRootAsPackage: true`). All local tasks go through it: `melos bs` (bootstrap / dependency resolve) and `melos run <task>`. Melos is pinned `^8.8.0` in `dev_dependencies`.
 - `dart pub get` — resolve dependencies directly (the single-package equivalent of `melos bs`). Declared `fpdart` `^1.2.0`; see the deviation note below (currently unused).
 
 ### Gate
 
-CI (`./.github/workflows/ci.yml`) runs on push to `main` and on PRs. Local equivalent, must be green before committing/pushing (also reachable in one shot via `melos run verify`, which runs analyze → format → test):
+There is no hosted CI — this estate runs no GitHub Actions. Run the gate yourself and keep it green before committing/pushing (one shot: `melos run verify`, which runs analyze → format → test):
 
 ```sh
 melos run analyze     # dart analyze --fatal-infos --fatal-warnings → "No issues found!"
@@ -61,7 +61,7 @@ Each item is a place this repo differs from the bible where the difference is de
 
 7. **`EquatableMixin` (deprecated form).** Code uses `with EquatableMixin`, which `equatable` 2.1.0 deprecates in favour of `with Equatable`. Same root cause as the red analyze gate; listed as a doctrine-shape call.
 
-8. **No `dart_arch_test` boundary test.** §2/§9.7 make package-boundary direction + cycle-freedom a CI hard gate. With a single package there is no cross-package direction to check today (harmless now), but this repo is one third of a core+adapters split the bible's §3 Topology B only half-sanctions; the boundary test is what would catch the split going wrong. Flagged for the workspace-level decision. (The former TODO comment in `test/bpmn_domain_test.dart` was removed so the `todo: error` analyze gate stays green; this deviation entry is the permanent record.)
+8. **No `dart_arch_test` boundary test.** §2/§9.7 make package-boundary direction + cycle-freedom a hard gate. With a single package there is no cross-package direction to check today (harmless now), but this repo is one third of a core+adapters split the bible's §3 Topology B only half-sanctions; the boundary test is what would catch the split going wrong. Flagged for the workspace-level decision. (The former TODO comment in `test/bpmn_domain_test.dart` was removed so the `todo: error` analyze gate stays green; this deviation entry is the permanent record.)
 
 9. **Single-package melos workspace (Topology C, `useRootAsPackage: true`), consumed as a git dependency.** The bible's workspace model (§2/§9.2-4) assumes a root pubspec with a `workspace:` list of sub-packages; this repo instead is a Topology-C melos workspace where the root pubspec IS the only package (`useRootAsPackage: true`, no `workspace:` list). Siblings consume it as an (unpinned `ref:`) git dependency — the failure mode the workspace model exists to prevent. Deliberate topology choice.
 
